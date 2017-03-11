@@ -90,10 +90,10 @@ public class YggdrasilClient {
                 this.nidhoggClientToken,
                 true);
         
-        final ClientResponse response = executeRequest(ENDPOINT_AUTHENTICATE, gson.toJson(request));
-        throwOnError(response.getEntity(String.class));
+        final String response = executeRequest(ENDPOINT_AUTHENTICATE, gson.toJson(request)).getEntity(String.class);
+        throwOnError(response);
         
-        final AuthenticateResponse authenticateResponse = gson.fromJson(response.getEntity(String.class), AuthenticateResponse.class);
+        final AuthenticateResponse authenticateResponse = gson.fromJson(response, AuthenticateResponse.class);
         return new Session(authenticateResponse.getSelectedProfile().getName(), authenticateResponse.getAccessToken(),
                 authenticateResponse.getClientToken());
     }
@@ -116,9 +116,9 @@ public class YggdrasilClient {
         final ClientResponse response = executeRequest(ENDPOINT_VALIDATE,
                 gson.toJson(new ValidationRequest(session.getAccessToken(), session.getClientToken())));
         
-        // invalid session or other error
-        throwOnError(response.getEntity(String.class));
-        
+        if (response.hasEntity() && response.getStatus() != 204 /* success, no content */) {
+            throwOnError(response.getEntity(String.class));
+        }
         // session is valid
         return true;
     }
@@ -136,14 +136,14 @@ public class YggdrasilClient {
             throw new IllegalArgumentException("Access token may not be empty");
         }
         
-        final ClientResponse response = executeRequest(ENDPOINT_REFRESH,
-                gson.toJson(new RefreshRequest(session.getAccessToken(), session.getClientToken(), true)));
+        final String response = executeRequest(ENDPOINT_REFRESH,
+                gson.toJson(new RefreshRequest(session.getAccessToken(), session.getClientToken(), true))).getEntity(String.class);
         
-        throwOnError(response.getEntity(String.class));
+        throwOnError(response);
         
         // the refresh response is similar to authentication response, except that the available profiles are
         // missing.
-        final AuthenticateResponse refreshResponse = gson.fromJson(response.getEntity(String.class), AuthenticateResponse.class);
+        final AuthenticateResponse refreshResponse = gson.fromJson(response, AuthenticateResponse.class);
         
         // refresh the session with latest data
         session.setAccessToken(refreshResponse.getAccessToken());
@@ -165,9 +165,9 @@ public class YggdrasilClient {
             throw new IllegalArgumentException("User Credentials may not be empty");
         }
         
-        final ClientResponse response = executeRequest(ENDPOINT_SIGNOUT,
-                gson.toJson(new SignOutRequest(data.getUsername(), data.getPassword())));
-        throwOnError(response.getEntity(String.class));
+        final String response = executeRequest(ENDPOINT_SIGNOUT,
+                gson.toJson(new SignOutRequest(data.getUsername(), data.getPassword()))).getEntity(String.class);
+        throwOnError(response);
     }
     
     /**
@@ -187,7 +187,9 @@ public class YggdrasilClient {
         final ClientResponse response = executeRequest(ENDPOINT_INVALIDATE,
                 gson.toJson(new ValidationRequest(session.getAccessToken(), session.getClientToken())));
         
-        throwOnError(response.getEntity(String.class));
+        if (response.hasEntity() && response.getStatus() != 204 /* success, no content */) {
+            throwOnError(response.getEntity(String.class));
+        }
     }
     
     /**
