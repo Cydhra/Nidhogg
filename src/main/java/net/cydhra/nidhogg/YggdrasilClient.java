@@ -90,10 +90,10 @@ public class YggdrasilClient {
                 this.nidhoggClientToken,
                 true);
         
-        final String response = executeRequest(ENDPOINT_AUTHENTICATE, gson.toJson(request)).getEntity(String.class);
-        throwOnError(response);
+        final String response = executeRequest(ENDPOINT_AUTHENTICATE, this.gson.toJson(request)).getEntity(String.class);
+        this.throwOnError(response);
         
-        final AuthenticateResponse authenticateResponse = gson.fromJson(response, AuthenticateResponse.class);
+        final AuthenticateResponse authenticateResponse = this.gson.fromJson(response, AuthenticateResponse.class);
         return new Session(authenticateResponse.getSelectedProfile().getName(), authenticateResponse.getAccessToken(),
                 authenticateResponse.getClientToken());
     }
@@ -114,10 +114,10 @@ public class YggdrasilClient {
         }
         
         final ClientResponse response = executeRequest(ENDPOINT_VALIDATE,
-                gson.toJson(new ValidationRequest(session.getAccessToken(), session.getClientToken())));
+                this.gson.toJson(new ValidationRequest(session.getAccessToken(), session.getClientToken())));
         
         if (response.hasEntity() && response.getStatus() != 204 /* success, no content */) {
-            throwOnError(response.getEntity(String.class));
+            this.throwOnError(response.getEntity(String.class));
         }
         // session is valid
         return true;
@@ -137,13 +137,13 @@ public class YggdrasilClient {
         }
         
         final String response = executeRequest(ENDPOINT_REFRESH,
-                gson.toJson(new RefreshRequest(session.getAccessToken(), session.getClientToken(), true))).getEntity(String.class);
+                this.gson.toJson(new RefreshRequest(session.getAccessToken(), session.getClientToken(), true))).getEntity(String.class);
         
-        throwOnError(response);
+        this.throwOnError(response);
         
         // the refresh response is similar to authentication response, except that the available profiles are
         // missing.
-        final AuthenticateResponse refreshResponse = gson.fromJson(response, AuthenticateResponse.class);
+        final AuthenticateResponse refreshResponse = this.gson.fromJson(response, AuthenticateResponse.class);
         
         // refresh the session with latest data
         session.setAccessToken(refreshResponse.getAccessToken());
@@ -166,8 +166,8 @@ public class YggdrasilClient {
         }
         
         final String response = executeRequest(ENDPOINT_SIGNOUT,
-                gson.toJson(new SignOutRequest(data.getUsername(), data.getPassword()))).getEntity(String.class);
-        throwOnError(response);
+                this.gson.toJson(new SignOutRequest(data.getUsername(), data.getPassword()))).getEntity(String.class);
+        this.throwOnError(response);
     }
     
     /**
@@ -185,10 +185,10 @@ public class YggdrasilClient {
         
         // invalidation and validation requests are exactly the same
         final ClientResponse response = executeRequest(ENDPOINT_INVALIDATE,
-                gson.toJson(new ValidationRequest(session.getAccessToken(), session.getClientToken())));
+                this.gson.toJson(new ValidationRequest(session.getAccessToken(), session.getClientToken())));
         
         if (response.hasEntity() && response.getStatus() != 204 /* success, no content */) {
-            throwOnError(response.getEntity(String.class));
+            this.throwOnError(response.getEntity(String.class));
         }
     }
     
@@ -218,7 +218,7 @@ public class YggdrasilClient {
     private void throwOnError(final String response) {
         if (!errorMessageRegex.matcher(response).find()) return;
         
-        final ErrorResponse errorResponse = gson.fromJson(response, ErrorResponse.class);
+        final ErrorResponse errorResponse = this.gson.fromJson(response, ErrorResponse.class);
         
         // on user migrated error
         if (errorResponse.getCause() != null && errorResponse.getCause().equals("UserMigratedException")) {
