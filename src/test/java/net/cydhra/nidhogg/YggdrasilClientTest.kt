@@ -2,7 +2,6 @@
 
 package net.cydhra.nidhogg
 
-import junit.framework.Assert.assertFalse
 import junit.framework.Assert.assertTrue
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.Session
