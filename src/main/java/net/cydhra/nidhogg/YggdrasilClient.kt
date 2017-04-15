@@ -52,7 +52,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
                 this.nidhoggClientToken,
                 true)
 
-        val response = executeRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_AUTHENTICATE, this.gson.toJson(request)).getEntity<String>(String::class.java)
+        val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_AUTHENTICATE, this.gson.toJson(request)).getEntity<String>(String::class.java)
         this.throwOnError(response)
 
         val authenticateResponse = this.gson.fromJson<AuthenticateResponse>(response, AuthenticateResponse::class.java)
@@ -73,7 +73,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
             throw IllegalArgumentException("Access token may not be empty")
         }
 
-        val response = executeRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_VALIDATE,
+        val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_VALIDATE,
                 this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken)))
 
         if (response.hasEntity() && response.status != 204 /* success, no content */) {
@@ -96,7 +96,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
             throw IllegalArgumentException("Access token may not be empty")
         }
 
-        val response = executeRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_REFRESH,
+        val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_REFRESH,
                 this.gson.toJson(RefreshRequest(session.accessToken, session.clientToken, true))).getEntity<String>(String::class.java)
 
         this.throwOnError(response)
@@ -128,7 +128,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
             throw IllegalArgumentException("User Credentials may not be empty")
         }
 
-        val response = executeRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_SIGNOUT,
+        val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_SIGNOUT,
                 this.gson.toJson(SignOutRequest(data.username, data.password)))
         if (response.status != 204) this.throwOnError(response.getEntity(String::class.java))
     }
@@ -149,7 +149,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         }
 
         // invalidation and validation requests are exactly the same
-        val response = executeRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_INVALIDATE,
+        val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_INVALIDATE,
                 this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken)))
 
         if (response.hasEntity() && response.status != 204 /* success, no content */) {
