@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.sun.jersey.api.client.Client
 import com.sun.jersey.api.client.ClientResponse
+import net.cydhra.nidhogg.YggdrasilAgent.MINECRAFT
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.exception.InvalidCredentialsException
@@ -23,6 +24,9 @@ private const val ENDPOINT_VALIDATE = "/validate"
 private const val ENDPOINT_SIGNOUT = "/signout"
 private const val ENDPOINT_INVALIDATE = "/invalidate"
 
+/**
+ * A client for the Yggdrasil Authentication service. It wraps all endpoints of the service in functions and respective data classes.
+ */
 class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN) {
 
     companion object {
@@ -38,21 +42,15 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
 
     /**
      * Log in with given account credentials at given service agent
-
+     *
      * @param credentials Yggdrasil account credentials
-     * *
      * @param agent       Yggdrasil account agent
-     * *
-     * *
+     *
      * @return a Yggdrasil session object
-     * *
-     * *
+     *
      * @throws UserMigratedException       if the account credentials used the player agentName but the account is migrated
-     * *
      * @throws InvalidCredentialsException if the given credentials are invalid
-     * *
      * @throws YggdrasilBanException       if the client is banned from Yggdrasil
-     * *
      * @throws IllegalArgumentException    if the account credentials are partially empty
      */
     fun login(credentials: AccountCredentials, agent: YggdrasilAgent = YggdrasilAgent.MINECRAFT): Session {
@@ -77,15 +75,10 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
 
     /**
      * Validate a Yggdrasil session.
-
+     *
      * @param session A session with access and client token
-     * *
-     * *
      * @return true, if the session is still valid. This method does not return false, but throws an appropriate exception
-     * *
-     * *
      * @throws IllegalArgumentException if the given session has an empty access token
-     * *
      * @throws InvalidSessionException  if the given session is invalid
      */
     fun validate(session: Session): Boolean {
@@ -105,12 +98,10 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
 
     /**
      * Refreshes a session at Yggdrasil
-
+     *
      * @param session a Yggdrasil session with valid access token
-     * *
-     * *
+     *
      * @throws IllegalArgumentException if the given session has an empty access token
-     * *
      * @throws InvalidSessionException  if the given session is already invalidated / was never valid
      */
     fun refresh(session: Session) {
@@ -219,12 +210,10 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
 
     /**
      * Executes a POST request to Yggdrasil with given request body and default settings (like User-Agent)
-
+     *
      * @param endpoint the Yggdrasil REST service endpoint
-     * *
      * @param body     the request body as JSON formatted string
-     * *
-     * *
+     *
      * @return the JSON formatted response
      */
     private fun executeRequest(endpoint: String, body: String): ClientResponse {
@@ -238,6 +227,9 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
     }
 }
 
+/**
+ * Different Agents for Yggdrasil authentication service. Currently, only [MINECRAFT] is supported.
+ */
 enum class YggdrasilAgent(val agentName: String) {
     MINECRAFT("Minecraft");
 }
