@@ -20,9 +20,11 @@ abstract class NidhoggClient(private val userAgent: String) {
      *
      * @return a [ClientResponse] object of the Jersey Rest API
      */
-    internal fun getRequest(host: String, endpoint: String): ClientResponse {
+    internal fun getRequest(host: String, endpoint: String, vararg queryParam: Pair<String, String>): ClientResponse {
         assert(endpoint.startsWith("/"))
         val resource = Client.create().resource(host).path(endpoint)
+        for (param in queryParam) resource.queryParam(param.first, param.second)
+
         return buildRequest(resource)
                 .get<ClientResponse>(ClientResponse::class.java)
     }
