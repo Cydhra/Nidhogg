@@ -36,10 +36,6 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         this.gson = GsonBuilder().create()
     }
 
-    fun login(credentials: AccountCredentials): Session {
-        return this.login(credentials, YggdrasilAgent.MINECRAFT)
-    }
-
     /**
      * Log in with given account credentials at given service agent
 
@@ -59,9 +55,8 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
      * *
      * @throws IllegalArgumentException    if the account credentials are partially empty
      */
-    fun login(credentials: AccountCredentials, agent: YggdrasilAgent): Session {
-        if (credentials.username == "" || credentials
-                .password == "") {
+    fun login(credentials: AccountCredentials, agent: YggdrasilAgent = YggdrasilAgent.MINECRAFT): Session {
+        if (credentials.username == "" || credentials.password == "") {
             throw IllegalArgumentException("User Credentials may not be empty")
         }
 
