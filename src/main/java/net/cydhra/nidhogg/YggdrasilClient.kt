@@ -151,8 +151,8 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         }
 
         val response = executeRequest(ENDPOINT_SIGNOUT,
-                this.gson.toJson(SignOutRequest(data.username, data.password))).getEntity<String>(String::class.java)
-        this.throwOnError(response)
+                this.gson.toJson(SignOutRequest(data.username, data.password)))
+        if (response.status != 204) this.throwOnError(response.getEntity(String::class.java))
     }
 
     /**
