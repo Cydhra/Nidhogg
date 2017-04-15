@@ -1,12 +1,11 @@
 # Nidhogg
-A Mojang [Yggdrasil](http://wiki.vg/Authentication) Java client for Minecraft Account authentication
+A Mojang [Yggdrasil](http://wiki.vg/Authentication) Java/Kotlin client for Minecraft Account authentication
 
 ![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)
 
 
 ## Compiling
-The library JAR can be build using ``mvn package``. Javadoc can be generated using ``mvn javadoc:javadoc`` or ``mvn javadoc:jar`` if you
-like the documentation in a JAR file.
+The library JAR can be build using ``mvn package``. Javadoc can be generated using ``mvn javadoc:javadoc`` or ``mvn javadoc:jar`` if you want the documentation in a JAR file.
 
 ## Usage
 The library consists of three main classes that may be used:
