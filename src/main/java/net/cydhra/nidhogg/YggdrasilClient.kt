@@ -52,10 +52,10 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
                 this.nidhoggClientToken,
                 true)
 
-        val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_AUTHENTICATE, this.gson.toJson(request)).getEntity<String>(String::class.java)
+        val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_AUTHENTICATE, this.gson.toJson(request)).getEntity(String::class.java)
         this.throwOnError(response)
 
-        val authenticateResponse = this.gson.fromJson<AuthenticateResponse>(response, AuthenticateResponse::class.java)
+        val authenticateResponse = this.gson.fromJson(response, AuthenticateResponse::class.java)
         return Session(authenticateResponse.selectedProfile!!.name, authenticateResponse.accessToken,
                 authenticateResponse.clientToken)
     }
@@ -77,7 +77,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
                 this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken)))
 
         if (response.hasEntity() && response.status != 204 /* success, no content */) {
-            this.throwOnError(response.getEntity<String>(String::class.java))
+            this.throwOnError(response.getEntity(String::class.java))
         }
         // session is valid
         return true
@@ -97,7 +97,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         }
 
         val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_REFRESH,
-                this.gson.toJson(RefreshRequest(session.accessToken, session.clientToken, true))).getEntity<String>(String::class.java)
+                this.gson.toJson(RefreshRequest(session.accessToken, session.clientToken, true))).getEntity(String::class.java)
 
         this.throwOnError(response)
 
@@ -153,7 +153,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
                 this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken)))
 
         if (response.hasEntity() && response.status != 204 /* success, no content */) {
-            this.throwOnError(response.getEntity<String>(String::class.java))
+            this.throwOnError(response.getEntity(String::class.java))
         }
     }
 
