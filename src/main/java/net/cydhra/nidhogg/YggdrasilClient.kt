@@ -42,7 +42,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
      */
     fun login(credentials: AccountCredentials, agent: YggdrasilAgent = YggdrasilAgent.MINECRAFT): Session {
         if (credentials.username == "" || credentials.password == "") {
-            throw IllegalArgumentException("User Credentials may not be empty")
+            throw IllegalArgumentException("User credentials may not be empty")
         }
 
         val request = LoginRequest(
