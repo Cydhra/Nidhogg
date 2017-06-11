@@ -8,22 +8,38 @@ A Mojang [Yggdrasil](http://wiki.vg/Authentication) Java/Kotlin client for Minec
 The library JAR can be build using ``mvn package``. Javadoc can be generated using ``mvn javadoc:javadoc`` or ``mvn javadoc:jar`` if you want the documentation in a JAR file.
 
 ## Usage
-The library consists of three main classes that may be used:
-``YggdrasilClient``, ``AccountCredentials``, ``Session``.
+The Yggdrasil API is wrapped in ``YggdrasilClient``. It can be optionally instantiated with a client token, that is then used for 
+identification at the Yggdrasil API. Alternatively, it uses a default token.
 
-``AccountCredentials`` and ``Session`` are simple data classes with one constructor, ``AccountCredentials`` is immutable, ``Session`` can
-be mutated, since refresh might change the access token.
+The client instance then offers the following methods:
 
-``YggdrasilClient`` is a wrapped REST client for the Yggdrasil authentication service. It provides all methods supported by the Yggdrasil
-authentication service:
-* ``login`` takes an ``AccountCredentials`` object and logs in at Yggdrasil. Returns a ``Session`` object.
-* ``validate`` takes a ``Session`` object and validates, that the session is still legal.
-* ``refresh`` takes a ``Session`` object and refreshes it, if it is too old to be valid.
-* ``invalidate`` takes a ``Session`` object and invalidates it, so it cannot be used for authentication anymore.
-* ``signout`` takes a ``AccountCredentials`` object and invalidates any session currently associated with this user.
+````Kotlin
+// login using credentials
+session = client.login(AccountCredentials(username, password))
 
-The ``YggdrasilClient`` takes one optional parameter in its constructor that sets the client token, that Nidhogg will use to identify itself
-at the Yggdrasil service. By default the value is set to "Nidhogg". It can be chosen arbitrarily.
+// validate a session. Returns true, if the session is valid, throws an appropriate exception otherwise.
+client.validate(session)
+
+// refreshes a session, if it is no longer valid
+client.refresh(session)
+
+// invalidate a session
+client.invalidate(session)
+
+// sign out of any existing sessions
+client.signOut(AccountCredentials(username, password))
+````
+
+The Mojang API is wrapped in ``MojangClient``. It can be instantiated the same way as the ``YggrasilClient``. It currently offers only 
+one method:
+
+````Kotlin
+// get the UUID by player name at a time. Parameter time is optional, if not given it will be defaulted to the system time.
+client.getUUIDbyUsername(name, time)
+````
+
+The other methods of ``MojangClient`` are not implemented, yet. 
+
 ## Maven Dependency
 This project is currently not in any Maven repository, but you can use [Jitpack](https://jitpack.io/) instead:
 
@@ -42,7 +58,7 @@ And then the following dependency:
 <dependency>
     <groupId>com.github.Cydhra</groupId>
     <artifactId>Nidhogg</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 </dependency>
 ````
 
