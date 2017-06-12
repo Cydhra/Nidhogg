@@ -13,4 +13,4 @@ package net.cydhra.nidhogg.requests
  *
  * see <a href="http://wiki.vg/Mojang_API#Username_-.3E_UUID_at_time">Mojang API</a>
  */
-data class UUIDResponse(val id: String, val name: String, val legacy: Boolean?, val demo: Boolean?)
+internal data class UUIDResponse(val id: String, val name: String, val legacy: Boolean?, val demo: Boolean?)

@@ -1,3 +1,3 @@
 package net.cydhra.nidhogg.requests
 
-class RefreshRequest(val accessToken: String, val clientToken: String, val requestUser: Boolean)
+internal class RefreshRequest(val accessToken: String, val clientToken: String, val requestUser: Boolean)
