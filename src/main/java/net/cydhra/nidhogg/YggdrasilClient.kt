@@ -56,7 +56,7 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         this.throwOnError(response)
 
         val authenticateResponse = this.gson.fromJson(response, AuthenticateResponse::class.java)
-        return Session(authenticateResponse.selectedProfile!!.name, authenticateResponse.accessToken,
+        return Session(authenticateResponse.selectedProfile!!.id, authenticateResponse.selectedProfile!!.name, authenticateResponse.accessToken,
                 authenticateResponse.clientToken)
     }
 
