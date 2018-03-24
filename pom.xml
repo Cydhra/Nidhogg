@@ -9,7 +9,7 @@
     <version>1.0</version>
 
     <properties>
-        <kotlin.version>1.1.1</kotlin.version>
+        <kotlin.version>1.2.31</kotlin.version>
     </properties>
 
     <build>
@@ -71,6 +71,7 @@
             </plugin>
 
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
         </plugins>

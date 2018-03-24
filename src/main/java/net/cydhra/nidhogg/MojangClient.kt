@@ -1,3 +1,5 @@
+@file:Suppress("CanBeParameter", "unused")
+
 package net.cydhra.nidhogg
 
 import net.cydhra.nidhogg.data.Session

@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package net.cydhra.nidhogg.requests
 
 internal class AuthenticateResponse(val accessToken: String,

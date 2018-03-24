@@ -1,3 +1,5 @@
+@file:Suppress("unused")
+
 package net.cydhra.nidhogg
 
 import com.google.gson.Gson
