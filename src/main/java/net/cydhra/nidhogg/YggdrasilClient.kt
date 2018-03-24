@@ -19,6 +19,8 @@ private const val ENDPOINT_INVALIDATE = "/invalidate"
 
 /**
  * A client for the Yggdrasil Authentication service. It wraps all endpoints of the service in functions and respective data classes.
+ *
+ * @param nidhoggClientToken the token used to identify this client at the Yggdrasil server. Can be chosen freely.
  */
 class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN) : NidhoggClient(nidhoggClientToken) {
 
@@ -64,7 +66,9 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
      * Validate a Yggdrasil session.
      *
      * @param session A session with access and client token
+     *
      * @return true, if the session is still valid. This method does not return false, but throws an appropriate exception
+     *
      * @throws IllegalArgumentException if the given session has an empty access token
      * @throws InvalidSessionException  if the given session is invalid
      */
@@ -115,12 +119,9 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
      * Sign out from an Yggdrasil account (invalidate all sessions currently associated with the given account)
 
      * @param data account's credentials
-     * *
-     * *
+     *
      * @throws IllegalArgumentException    if given credentials are partially empty
-     * *
      * @throws UserMigratedException       if the account credentials used the player agentName but the account is migrated
-     * *
      * @throws InvalidCredentialsException if the given credentials are invalid
      */
     fun signOut(data: AccountCredentials) {
@@ -137,10 +138,10 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
      * Invalidate a session. Yggdrasil will invalidate the access token so all sessions using it can no longer authenticate
 
      * @param session A so far valid [Session]
-     * *
-     * *
+     *
+     *
      * @throws IllegalArgumentException if the given session has an empty access token
-     * *
+     *
      * @throws InvalidSessionException  if the session was already invalid
      */
     fun invalidate(session: Session) {
