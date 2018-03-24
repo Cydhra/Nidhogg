@@ -20,6 +20,7 @@ class YggdrasilClientTest {
     companion object {
         val client = YggdrasilClient()
 
+        var uri: URI? = null
         lateinit var username: String
         lateinit var password: String
 
@@ -27,9 +28,9 @@ class YggdrasilClientTest {
 
         @BeforeClass
         @JvmStatic fun setUp() {
-            val uri: URI? = this.javaClass.classLoader.getResource("credentials").toURI();
+            uri = this.javaClass.classLoader.getResource("credentials")?.toURI();
             Assume.assumeNotNull(uri)
-            val file: File = File(uri)
+            val file = File(uri)
 
             val credentials: List<String> = file.readText().split("\n")
             username = credentials[0]
@@ -40,21 +41,25 @@ class YggdrasilClientTest {
 
     @Test
     fun _1_login() {
+        Assume.assumeNotNull(uri)
         session = client.login(AccountCredentials(username, password))
     }
 
     @Test
     fun _2_validate() {
+        Assume.assumeNotNull(uri)
         assertTrue(client.validate(session))
     }
 
     @Test
     fun _3_refresh() {
+        Assume.assumeNotNull(uri)
         client.refresh(session)
     }
 
     @Test(expected = InvalidSessionException::class)
     fun _4_invalidate() {
+        Assume.assumeNotNull(uri)
         client.invalidate(session)
 
         client.validate(session)
@@ -62,6 +67,7 @@ class YggdrasilClientTest {
 
     @Test
     fun _5_signOut() {
+        Assume.assumeNotNull(uri)
         client.signOut(AccountCredentials(username, password))
     }
 }
