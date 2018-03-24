@@ -24,7 +24,7 @@ class YggdrasilClientTest {
         lateinit var username: String
         lateinit var password: String
 
-        lateinit var session: Session
+        var session: Session? = null
 
         @BeforeClass
         @JvmStatic fun setUp() {
@@ -32,7 +32,7 @@ class YggdrasilClientTest {
             Assume.assumeNotNull(uri)
             val file = File(uri)
 
-            val credentials: List<String> = file.readText().split("\n")
+            val credentials: List<String> = file.readText().split(":")
             username = credentials[0]
             password = credentials[1]
         }
@@ -48,21 +48,25 @@ class YggdrasilClientTest {
     @Test
     fun _2_validate() {
         Assume.assumeNotNull(uri)
-        assertTrue(client.validate(session))
+        Assume.assumeNotNull(session)
+        assertTrue(client.validate(session!!))
     }
 
     @Test
     fun _3_refresh() {
         Assume.assumeNotNull(uri)
-        client.refresh(session)
+        Assume.assumeNotNull(session)
+        client.refresh(session!!)
     }
 
     @Test(expected = InvalidSessionException::class)
     fun _4_invalidate() {
         Assume.assumeNotNull(uri)
-        client.invalidate(session)
+        Assume.assumeNotNull(session)
 
-        client.validate(session)
+        client.invalidate(session!!)
+
+        client.validate(session!!)
     }
 
     @Test
