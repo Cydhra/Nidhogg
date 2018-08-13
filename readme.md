@@ -44,7 +44,6 @@ The other methods of ``MojangClient`` are not implemented, yet.
 This project is currently not in any Maven repository, but you can use [Jitpack](https://jitpack.io/) instead:
 
 #### Maven
-Add the Jitpack service repository
 ````
 <repositories>
     <repository>
