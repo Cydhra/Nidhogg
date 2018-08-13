@@ -72,6 +72,9 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      *
      * @param names a list of at most 100 player names
      *
+     * @return a list of at most 100 [UUIDEntries][UUIDEntry]. If any provided name is not associated with any account, no corresponding
+     * UUID will be returned
+     *
      * @throws IllegalArgumentException if more than 100 names are given in [names]
      * @throws IllegalArgumentException if one name is an empty string
      */
