@@ -35,7 +35,7 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      * does only work, if the name was changed at least once or the account is legacy (not migrated).
      *
      * See also: <a href="http://wiki.vg/Mojang_API#Username_-.3E_UUID_at_time">Mojang API</a>
-     * @return Optional UUID of given user at that time or empty optional, of no such user is found
+     * @return UUID of given user at that time or null, of no such user is found
      */
     fun getUUIDbyUsername(name: String, time: Instant? = null): UUID? {
         val endpoint = USER_TO_UUID_BY_TIME_ENDPOINT.format(name)
