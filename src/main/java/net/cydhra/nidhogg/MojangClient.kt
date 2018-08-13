@@ -2,6 +2,7 @@
 
 package net.cydhra.nidhogg
 
+import net.cydhra.nidhogg.data.NameEntry
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.requests.UUIDResponse
 import java.awt.image.BufferedImage
@@ -13,7 +14,8 @@ private const val HOST_STATUS_URL = "https://status.mojang.com"
 private const val HOST_API_URL = "https://api.mojang.com"
 
 private const val STATUS_ENDPOINT = "/check"
-private const val USER_TO_UUID_BY_TIME_ENDPOINT = "/users/profiles/minecraft/"
+private const val USER_TO_UUID_BY_TIME_ENDPOINT = "/users/profiles/minecraft/%s"
+private const val NAME_HISTORY_BY_UUID_ENDPOINT = "/user/profiles/%s/names"
 
 /**
  * A client for the Mojang API. It wraps the endpoints of the service in functions and respective data classes.
@@ -35,22 +37,22 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      * See also: <a href="http://wiki.vg/Mojang_API#Username_-.3E_UUID_at_time">Mojang API</a>
      * @return Optional UUID of given user at that time or empty optional, of no such user is found
      */
-    fun getUUIDbyUsername(name: String, time: Instant? = null): Optional<UUID> {
-        val endpoint = USER_TO_UUID_BY_TIME_ENDPOINT + name
+    fun getUUIDbyUsername(name: String, time: Instant? = null): UUID? {
+        val endpoint = USER_TO_UUID_BY_TIME_ENDPOINT.format(name)
 
         val response = if (time != null)
             getRequest(HOST_API_URL, endpoint, Pair("at", time.epochSecond.toString()))
         else
             getRequest(HOST_API_URL, endpoint)
 
-        if (response.status == 204) return Optional.empty()
+        if (response.status == 204) return null
 
         val uuid = gson.fromJson(response.getEntity(String::class.java), UUIDResponse::class.java).id
         val formattedUUID = "${uuid.subSequence(0, 8)}-${uuid.subSequence(8, 12)}-${uuid.subSequence(12, 16)}-${uuid.subSequence(16, 20)}-${uuid.subSequence(20, 32)}"
-        return Optional.of(UUID.fromString(formattedUUID))
+        return UUID.fromString(formattedUUID)
     }
 
-    fun getNameHistoryByUUID(uuid: UUID) {
+    fun getNameHistoryByUUID(uuid: UUID): Array<NameEntry> {
         throw UnsupportedOperationException()
     }
 
