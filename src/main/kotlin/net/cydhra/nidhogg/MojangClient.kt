@@ -53,8 +53,16 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
             getRequest(MOJANG_API_URL, endpoint)
 
         if (response.status == 204) return null
+        else if (response.status == 200)
+            return gson.fromJson(response.getEntity(String::class.java), UUIDEntry::class.java)
+        else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
 
-        return gson.fromJson(response.getEntity(String::class.java), UUIDEntry::class.java)
+            if (error.error == "TooManyRequestsException")
+                throw TooManyRequestsException(error.errorMessage)
+            else
+                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+        }
     }
 
     /**
@@ -68,7 +76,16 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         val endpoint = NAME_HISTORY_BY_UUID_ENDPOINT.format(uuid.toString().replace("-", ""))
         val response = getRequest(MOJANG_API_URL, endpoint)
 
-        return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<NameEntry>>() {}.type)
+        if (response.status == 200)
+            return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<NameEntry>>() {}.type)
+        else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            if (error.error == "TooManyRequestsException")
+                throw TooManyRequestsException(error.errorMessage)
+            else
+                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+        }
     }
 
     /**
@@ -94,7 +111,16 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
 
         val response = postRequest(MOJANG_API_URL, UUIDS_BY_NAMES_ENDPOINT, gson.toJson(names))
 
-        return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<UUIDEntry>>() {}.type)
+        if (response.status == 200)
+            return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<UUIDEntry>>() {}.type)
+        else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            if (error.error == "TooManyRequestsException")
+                throw TooManyRequestsException(error.errorMessage)
+            else
+                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+        }
     }
 
     /**
