@@ -17,17 +17,25 @@ abstract class NidhoggClient(private val userAgent: String) {
 
     /**
      * Executes a RESTful GET request at a given host and resource.
-     * @param Hostname of requested service
+     * @param host name of requested service
      * @param endpoint resource endpoint that is requested
+     * @param header header fields to set in the request. Empty by default
+     * @param queryParams query parameter for the request. Empty by default
      *
      * @return a [ClientResponse] object of the Jersey Rest API
      */
-    internal fun getRequest(host: String, endpoint: String, vararg queryParam: Pair<String, String>): ClientResponse {
+    internal fun getRequest(host: String, endpoint: String, header: Map<String, String> = emptyMap(),
+            queryParams: Map<String, String> = emptyMap()): ClientResponse {
         assert(endpoint.startsWith("/"))
-        val resource = Client.create().resource(host).path(endpoint)
-        for (param in queryParam) resource.queryParam(param.first, param.second)
 
-        return buildRequest(resource)
+        val requestBuilder = Client.create().resource(host).path(endpoint)
+
+        for ((key, value) in header)
+            requestBuilder.header(key, value)
+        for ((key, value) in queryParams)
+            requestBuilder.queryParam(key, value)
+
+        return buildRequest(requestBuilder)
                 .get<ClientResponse>(ClientResponse::class.java)
     }
 
@@ -37,19 +45,20 @@ abstract class NidhoggClient(private val userAgent: String) {
      * @param endpoint resource endpoint that is requested
      * @param body request body entity
      * @param mediaType the media type of the post request. Defaults to [MediaType.APPLICATION_JSON_TYPE]
-     * @param headers header flags to set in the requests. Empty by default
+     * @param header header fields to set in the request. Empty by default
      *
      * @return a [ClientResponse] object of Jersey Rest API
      */
     internal fun postRequest(host: String, endpoint: String, body: Any,
-            mediaType: MediaType = MediaType.APPLICATION_JSON_TYPE, headers: Map<String, String> = emptyMap()): ClientResponse {
+            mediaType: MediaType = MediaType.APPLICATION_JSON_TYPE, header: Map<String, String> = emptyMap()): ClientResponse {
         assert(endpoint.startsWith("/"))
         val resource = Client.create().resource(host).path(endpoint)
         val requestBuilder = buildRequest(resource)
-        for ((key, value) in headers)
+        for ((key, value) in header)
             requestBuilder.header(key, value)
 
-        return requestBuilder.type(mediaType)
+        return requestBuilder
+                .type(mediaType)
                 .post<ClientResponse>(ClientResponse::class.java, body)
     }
 
