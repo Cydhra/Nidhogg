@@ -28,14 +28,15 @@ abstract class NidhoggClient(private val userAgent: String) {
             queryParams: Map<String, String> = emptyMap()): ClientResponse {
         assert(endpoint.startsWith("/"))
 
-        val requestBuilder = Client.create().resource(host).path(endpoint)
+        val resource = Client.create().resource(host).path(endpoint)
+        for ((key, value) in queryParams)
+            resource.queryParam(key, value)
 
+        val requestBuilder = buildRequest(resource)
         for ((key, value) in header)
             requestBuilder.header(key, value)
-        for ((key, value) in queryParams)
-            requestBuilder.queryParam(key, value)
 
-        return buildRequest(requestBuilder)
+        return requestBuilder
                 .get<ClientResponse>(ClientResponse::class.java)
     }
 

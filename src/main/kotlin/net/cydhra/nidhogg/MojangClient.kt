@@ -154,13 +154,34 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         }
     }
 
+    /**
+     * Check whether the current IP is considered secure by the Mojang API server. To secure the IP, the security questions must be solved.
+     *
+     * @param session the session whose security questions have been solved and for whom this IP could now be considered secure
+     *
+     * @return true, if the IP is considered secure
+     *
+     * @throws UnauthorizedOperationException if the session is invalid
+     */
     fun isIpSecure(session: Session): Boolean {
-        val response = getRequest(MOJANG_API_URL, LOCATION_ENDPOINT)
+        val response = getRequest(MOJANG_API_URL, LOCATION_ENDPOINT, header = mapOf(
+                "Authorization" to "Bearer ${session.accessToken}"
+        )
+        )
 
-        println(response.status)
-        println(response.getEntity(String::class.java))
+        if (response.status == 204)
+            return true
+        else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
 
-        return true
+            when {
+                error.error == "Forbidden" && error.errorMessage == "Current IP is not secured" -> return false
+
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
+        }
     }
 
     /**
