@@ -58,7 +58,7 @@ And then the following dependency:
 <dependency>
     <groupId>com.github.Cydhra</groupId>
     <artifactId>Nidhogg</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
 </dependency>
 ````
 
