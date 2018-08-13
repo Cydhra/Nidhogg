@@ -35,7 +35,7 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      * does only work, if the name was changed at least once or the account is legacy (not migrated).
      *
      * See also: <a href="http://wiki.vg/Mojang_API#Username_-.3E_UUID_at_time">Mojang API</a>
-     * @return UUID of given user at that time or null, of no such user is found
+     * @return Optional UUID of given user at that time or empty optional, of no such user is found
      */
     fun getUUIDbyUsername(name: String, time: Instant? = null): UUID? {
         val endpoint = USER_TO_UUID_BY_TIME_ENDPOINT.format(name)
@@ -48,12 +48,23 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         if (response.status == 204) return null
 
         val uuid = gson.fromJson(response.getEntity(String::class.java), UUIDResponse::class.java).id
-        val formattedUUID = "${uuid.subSequence(0, 8)}-${uuid.subSequence(8, 12)}-${uuid.subSequence(12, 16)}-${uuid.subSequence(16, 20)}-${uuid.subSequence(20, 32)}"
+        val formattedUUID = "${uuid.subSequence(0, 8)}-${uuid.subSequence(8, 12)}-" +
+                "${uuid.subSequence(12, 16)}-${uuid.subSequence(16, 20)}-${uuid.subSequence(20, 32)}"
         return UUID.fromString(formattedUUID)
     }
 
+    /**
+     * Get the history of usernames associated with an account. The history is a sorted array beginning with the oldest entry.
+     *
+     * @param uuid the account's uuid
+     *
+     * @return an array of [NameEntries][NameEntry]
+     */
     fun getNameHistoryByUUID(uuid: UUID): Array<NameEntry> {
-        throw UnsupportedOperationException()
+        val endpoint = NAME_HISTORY_BY_UUID_ENDPOINT.format(uuid.toString().replace("-", ""))
+        val response = getRequest(HOST_API_URL, endpoint)
+
+        return gson.fromJson(response.getEntity(String::class.java), Array<NameEntry>::class.java)
     }
 
     fun getUUIDsByNames(names: Array<String>) {
