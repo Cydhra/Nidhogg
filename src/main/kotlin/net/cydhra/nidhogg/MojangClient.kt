@@ -7,8 +7,8 @@ import net.cydhra.nidhogg.data.NameEntry
 import net.cydhra.nidhogg.data.Profile
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.data.UUIDEntry
+import net.cydhra.nidhogg.exception.TooManyRequestsException
 import net.cydhra.nidhogg.requests.ErrorResponse
-import net.cydhra.nidhogg.requests.TooManyRequestsException
 import java.awt.image.BufferedImage
 import java.net.URL
 import java.time.Instant

@@ -1,4 +1,4 @@
-package net.cydhra.nidhogg.requests
+package net.cydhra.nidhogg.exception
 
 /**
  * Thrown by the API, if the rate limit is reached
