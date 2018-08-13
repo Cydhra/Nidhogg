@@ -4,8 +4,11 @@ package net.cydhra.nidhogg
 
 import com.google.gson.reflect.TypeToken
 import net.cydhra.nidhogg.data.NameEntry
+import net.cydhra.nidhogg.data.Profile
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.data.UUIDEntry
+import net.cydhra.nidhogg.requests.ErrorResponse
+import net.cydhra.nidhogg.requests.TooManyRequestsException
 import java.awt.image.BufferedImage
 import java.net.URL
 import java.time.Instant
@@ -13,12 +16,13 @@ import java.util.*
 
 private const val STATUS_API_URL = "https://status.mojang.com"
 private const val MOJANG_API_URL = "https://api.mojang.com"
-private const val SESSION_SERVER_URL = "https://sessionserer.mojang.com"
+private const val SESSION_SERVER_URL = "https://sessionserver.mojang.com"
 
 private const val STATUS_ENDPOINT = "/check"
 private const val USER_TO_UUID_BY_TIME_ENDPOINT = "/users/profiles/minecraft/%s"
 private const val NAME_HISTORY_BY_UUID_ENDPOINT = "/user/profiles/%s/names"
 private const val UUIDS_BY_NAMES_ENDPOINT = "/profiles/minecraft"
+private const val PROFILE_BY_UUID_ENDPOINT = "/session/minecraft/profile/%s"
 
 /**
  * A client for the Mojang API. It wraps the endpoints of the service in functions and respective data classes.
@@ -93,8 +97,29 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<UUIDEntry>>() {}.type)
     }
 
-    fun getProfileByUUID(uuid: UUID) {
-        throw UnsupportedOperationException()
+    /**
+     * Get an account's [Profile] by its UUID. This API is rate limited to one request per minute per user, but there may be as many
+     * requests for unique users as you like
+     *
+     * @param uuid account [UUID]
+     *
+     * @return the UUID's [Profile]
+     *
+     * @throws TooManyRequestsException if the rate limit is reached
+     */
+    fun getProfileByUUID(uuid: UUID): Profile {
+        val response = getRequest(SESSION_SERVER_URL, PROFILE_BY_UUID_ENDPOINT.format(uuid.toString().replace("-", "")))
+
+        if (response.status == 200)
+            return gson.fromJson(response.getEntity(String::class.java), Profile::class.java)
+        else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            if (error.error == "TooManyRequestsException")
+                throw TooManyRequestsException(error.errorMessage)
+            else
+                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+        }
     }
 
     fun changeSkin(session: Session, uuid: UUID, source: URL) {

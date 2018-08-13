@@ -11,7 +11,7 @@ import java.util.*
 
 /* an epoch second, where the UUID of account Cydhra was valid */
 private const val EPOCH_SECOND = 1492297560L
-
+private const val CYDHRA_UUID = "fdba166c-4eab-43ea-b0e8-8d7d62e1c417"
 class MojangClientTest {
 
     companion object {
@@ -38,7 +38,7 @@ class MojangClientTest {
 
         Assert.assertNotNull(uuidEntry)
 
-        Assert.assertEquals("fdba166c-4eab-43ea-b0e8-8d7d62e1c417", uuidEntry!!.uuid.toString())
+        Assert.assertEquals(CYDHRA_UUID, uuidEntry!!.uuid.toString())
         Assert.assertEquals("Cydhra", uuidEntry.name)
         Assert.assertNull(uuidEntry.legacy)
         Assert.assertNull(uuidEntry.demo)
@@ -47,7 +47,7 @@ class MojangClientTest {
     @Test
     fun getNameHistoryByUUID() {
         Assert.assertEquals(
-                client.getNameHistoryByUUID(UUID.fromString("fdba166c-4eab-43ea-b0e8-8d7d62e1c417"))[0],
+                client.getNameHistoryByUUID(UUID.fromString(CYDHRA_UUID))[0],
                 NameEntry("Cydhra", null)
         )
     }
@@ -72,6 +72,10 @@ class MojangClientTest {
 
     @Test
     fun getProfileByUUID() {
+        val profile = client.getProfileByUUID(UUID.fromString(CYDHRA_UUID))
+
+        Assert.assertNotNull(profile)
+        Assert.assertNotNull(profile.textures)
     }
 
     @Test
