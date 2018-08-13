@@ -39,12 +39,12 @@ abstract class NidhoggClient(private val userAgent: String) {
      *
      * @return a [ClientResponse] object of Jersey Rest API
      */
-    internal fun postRequest(host: String, endpoint: String, body: String): ClientResponse {
+    internal fun postRequest(host: String, endpoint: String, body: Any, mediaType: MediaType = MediaType.APPLICATION_JSON_TYPE): ClientResponse {
         assert(endpoint.startsWith("/"))
         val resource = Client.create().resource(host).path(endpoint)
         return buildRequest(resource)
-                .entity(body, MediaType.APPLICATION_JSON_TYPE)
-                .post<ClientResponse>(ClientResponse::class.java)
+                .type(mediaType)
+                .post<ClientResponse>(ClientResponse::class.java, body)
     }
 
     /**
