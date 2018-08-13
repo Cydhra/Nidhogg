@@ -4,7 +4,7 @@ A Mojang [Yggdrasil](http://wiki.vg/Authentication) Java/Kotlin client for Minec
 ![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)
 
 
-## Compiling
+## Compiling (to be updated)
 The library JAR can be build using ``mvn package``. Javadoc can be generated using ``mvn javadoc:javadoc`` or ``mvn javadoc:jar`` if you want the documentation in a JAR file.
 
 ## Usage
@@ -40,9 +40,10 @@ client.getUUIDbyUsername(name, time)
 
 The other methods of ``MojangClient`` are not implemented, yet. 
 
-## Maven Dependency
+## Dependency Management
 This project is currently not in any Maven repository, but you can use [Jitpack](https://jitpack.io/) instead:
 
+#### Maven
 Add the Jitpack service repository
 ````
 <repositories>
@@ -53,13 +54,25 @@ Add the Jitpack service repository
 </repositories>
 ````
 
-And then the following dependency:
 ````
 <dependency>
     <groupId>com.github.Cydhra</groupId>
     <artifactId>Nidhogg</artifactId>
     <version>1.2</version>
 </dependency>
+````
+
+#### Gradle 
+
+````
+repositories {
+     maven { url "https://jitpack.io" }
+}
+````
+````
+dependencies {
+    compile group: 'com.github.Cydhra', name: 'Nidhogg', version: '1.2'
+}
 ````
 
 The version should be replaced with the latest release. Jitpack will automatically fetch the requested release by its tag (provided as
