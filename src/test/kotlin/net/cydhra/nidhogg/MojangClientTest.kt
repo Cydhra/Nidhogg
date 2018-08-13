@@ -77,16 +77,4 @@ class MojangClientTest {
         Assert.assertNotNull(profile)
         Assert.assertNotNull(profile.textures)
     }
-
-    @Test
-    fun changeSkin() {
-    }
-
-    @Test
-    fun uploadSkin() {
-    }
-
-    @Test
-    fun resetSkin() {
-    }
 }

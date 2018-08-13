@@ -3,16 +3,19 @@
 package net.cydhra.nidhogg
 
 import com.google.gson.reflect.TypeToken
+import com.sun.jersey.core.util.MultivaluedMapImpl
 import net.cydhra.nidhogg.data.NameEntry
 import net.cydhra.nidhogg.data.Profile
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.data.UUIDEntry
 import net.cydhra.nidhogg.exception.TooManyRequestsException
+import net.cydhra.nidhogg.exception.UnauthorizedOperationException
 import net.cydhra.nidhogg.requests.ErrorResponse
 import java.awt.image.BufferedImage
 import java.net.URL
 import java.time.Instant
 import java.util.*
+import javax.ws.rs.core.MediaType
 
 private const val STATUS_API_URL = "https://status.mojang.com"
 private const val MOJANG_API_URL = "https://api.mojang.com"
@@ -23,6 +26,7 @@ private const val USER_TO_UUID_BY_TIME_ENDPOINT = "/users/profiles/minecraft/%s"
 private const val NAME_HISTORY_BY_UUID_ENDPOINT = "/user/profiles/%s/names"
 private const val UUIDS_BY_NAMES_ENDPOINT = "/profiles/minecraft"
 private const val PROFILE_BY_UUID_ENDPOINT = "/session/minecraft/profile/%s"
+private const val SKIN_ENDPOINT = "/user/profile/%s/skin"
 
 /**
  * A client for the Mojang API. It wraps the endpoints of the service in functions and respective data classes.
@@ -58,10 +62,10 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         else {
             val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
 
-            if (error.error == "TooManyRequestsException")
-                throw TooManyRequestsException(error.errorMessage)
-            else
-                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
         }
     }
 
@@ -81,10 +85,10 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         else {
             val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
 
-            if (error.error == "TooManyRequestsException")
-                throw TooManyRequestsException(error.errorMessage)
-            else
-                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
         }
     }
 
@@ -116,10 +120,10 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         else {
             val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
 
-            if (error.error == "TooManyRequestsException")
-                throw TooManyRequestsException(error.errorMessage)
-            else
-                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
         }
     }
 
@@ -141,15 +145,48 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         else {
             val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
 
-            if (error.error == "TooManyRequestsException")
-                throw TooManyRequestsException(error.errorMessage)
-            else
-                throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
         }
     }
 
-    fun changeSkin(session: Session, uuid: UUID, source: URL) {
-        throw UnsupportedOperationException()
+    /**
+     * Change the Minecraft skin of an account. This request is only valid, if a valid session is supplied and the IP of the requesting
+     * client is secured.
+     *
+     * @param session a valid session for the account whose skin shall be changed
+     * @param source a URL to an internet address containing a valid skin image
+     * @param slimModel true, if the skin is the slim model
+     *
+     * @throws UnauthorizedOperationException if the IP is not secured or the session is invalid
+     */
+    fun changeSkin(session: Session, source: URL, slimModel: Boolean = false) {
+        val header = mapOf(
+                "Authorization" to "Bearer ${session.accessToken}"
+        )
+        val formData = MultivaluedMapImpl()
+        formData.add("model", if (slimModel) "slim" else "")
+        formData.add("url", source.toExternalForm())
+
+        val response = postRequest(MOJANG_API_URL,
+                SKIN_ENDPOINT.format(session.id),
+                formData,
+                MediaType.APPLICATION_FORM_URLENCODED_TYPE,
+                header
+        )
+
+        if (response.status != 200) {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                error.error == "Forbidden" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
+        }
     }
 
     fun uploadSkin(session: Session, uuid: UUID, skin: BufferedImage) {
