@@ -5,8 +5,8 @@ import java.util.*
 /**
  * A response from Mojang API about a player's UUID
  *
- * @param id the requested UUID
- * @param name the name of the UUID (not the requested name)
+ * @param id the requested UUID as a string without hyphens. Use [uuid] for an actual instance of [UUID]
+ * @param name the current name of the account (not the requested name, if an older name was requested)
  * @param legacy only appears when true - if the account is not migrated
  * @param demo only appears when true - if the account hasn't bought an account
  *
