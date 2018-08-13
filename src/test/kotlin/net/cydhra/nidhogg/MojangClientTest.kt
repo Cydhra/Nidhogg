@@ -3,7 +3,9 @@ package net.cydhra.nidhogg
 import net.cydhra.nidhogg.data.NameEntry
 import org.junit.Assert
 import org.junit.BeforeClass
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExpectedException
 import java.time.Instant
 import java.util.*
 
@@ -21,6 +23,10 @@ class MojangClientTest {
             client = MojangClient()
         }
     }
+
+    @Rule
+    @JvmField
+    val ruleThrown = ExpectedException.none()!!
 
     @Test
     fun checkStatus() {
@@ -48,6 +54,20 @@ class MojangClientTest {
 
     @Test
     fun getUUIDsByNames() {
+        val uuidEntries = client.getUUIDsByNames(listOf("Cydhra", "ThisPlayerDoesNotExistBecause@"))
+        Assert.assertEquals(1, uuidEntries.size)
+    }
+
+    @Test
+    fun requestMoreThan100UUIDs() {
+        ruleThrown.expect(IllegalArgumentException::class.java)
+        client.getUUIDsByNames(Collections.nCopies(101, "Cydhra"))
+    }
+
+    @Test
+    fun requestInvalidUsernames() {
+        ruleThrown.expect(IllegalArgumentException::class.java)
+        client.getUUIDsByNames(listOf(""))
     }
 
     @Test

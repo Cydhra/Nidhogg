@@ -17,6 +17,7 @@ private const val HOST_API_URL = "https://api.mojang.com"
 private const val STATUS_ENDPOINT = "/check"
 private const val USER_TO_UUID_BY_TIME_ENDPOINT = "/users/profiles/minecraft/%s"
 private const val NAME_HISTORY_BY_UUID_ENDPOINT = "/user/profiles/%s/names"
+private const val UUIDS_BY_NAMES_ENDPOINT = "/profiles/minecraft"
 
 /**
  * A client for the Mojang API. It wraps the endpoints of the service in functions and respective data classes.
@@ -65,8 +66,27 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<NameEntry>>() {}.type)
     }
 
-    fun getUUIDsByNames(names: Array<String>) {
-        throw UnsupportedOperationException()
+    /**
+     * Bulk request a list of UUIDs by a list of player names. Names that are unknown will not return anything and will not result in an
+     * error. The maximum number of requested names is 100.
+     *
+     * @param names a list of at most 100 player names
+     *
+     * @throws IllegalArgumentException if more than 100 names are given in [names]
+     * @throws IllegalArgumentException if one name is an empty string
+     */
+    fun getUUIDsByNames(names: List<String>): List<UUIDEntry> {
+        // the api also raises those errors but of course the input can already be validated here and then the response can be expected to
+        // be valid
+        if (names.size > 100)
+            throw IllegalArgumentException("You cannot request more than 100 names per request")
+
+        if (names.any { it == "" })
+            throw IllegalArgumentException("profileName can not be null or empty.")
+
+        val response = postRequest(HOST_API_URL, UUIDS_BY_NAMES_ENDPOINT, gson.toJson(names))
+
+        return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<UUIDEntry>>() {}.type)
     }
 
     fun getProfileByUUID(uuid: UUID) {
