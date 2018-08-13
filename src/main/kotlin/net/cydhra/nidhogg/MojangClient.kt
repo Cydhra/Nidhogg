@@ -11,8 +11,9 @@ import java.net.URL
 import java.time.Instant
 import java.util.*
 
-private const val HOST_STATUS_URL = "https://status.mojang.com"
-private const val HOST_API_URL = "https://api.mojang.com"
+private const val STATUS_API_URL = "https://status.mojang.com"
+private const val MOJANG_API_URL = "https://api.mojang.com"
+private const val SESSION_SERVER_URL = "https://sessionserer.mojang.com"
 
 private const val STATUS_ENDPOINT = "/check"
 private const val USER_TO_UUID_BY_TIME_ENDPOINT = "/users/profiles/minecraft/%s"
@@ -43,9 +44,9 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         val endpoint = USER_TO_UUID_BY_TIME_ENDPOINT.format(name)
 
         val response = if (time != null)
-            getRequest(HOST_API_URL, endpoint, Pair("at", time.epochSecond.toString()))
+            getRequest(MOJANG_API_URL, endpoint, Pair("at", time.epochSecond.toString()))
         else
-            getRequest(HOST_API_URL, endpoint)
+            getRequest(MOJANG_API_URL, endpoint)
 
         if (response.status == 204) return null
 
@@ -61,7 +62,7 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      */
     fun getNameHistoryByUUID(uuid: UUID): List<NameEntry> {
         val endpoint = NAME_HISTORY_BY_UUID_ENDPOINT.format(uuid.toString().replace("-", ""))
-        val response = getRequest(HOST_API_URL, endpoint)
+        val response = getRequest(MOJANG_API_URL, endpoint)
 
         return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<NameEntry>>() {}.type)
     }
@@ -87,7 +88,7 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         if (names.any { it == "" })
             throw IllegalArgumentException("profileName can not be null or empty.")
 
-        val response = postRequest(HOST_API_URL, UUIDS_BY_NAMES_ENDPOINT, gson.toJson(names))
+        val response = postRequest(MOJANG_API_URL, UUIDS_BY_NAMES_ENDPOINT, gson.toJson(names))
 
         return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<UUIDEntry>>() {}.type)
     }
