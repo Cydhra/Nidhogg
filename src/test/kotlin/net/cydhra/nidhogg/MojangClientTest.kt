@@ -28,10 +28,14 @@ class MojangClientTest {
 
     @Test
     fun getUUIDbyUsername() {
-        Assert.assertEquals(
-                "fdba166c-4eab-43ea-b0e8-8d7d62e1c417",
-                client.getUUIDbyUsername("Cydhra", Instant.ofEpochSecond(EPOCH_SECOND)).toString()
-        )
+        val uuidEntry = client.getUUIDbyUsername("Cydhra", Instant.ofEpochSecond(EPOCH_SECOND))
+
+        Assert.assertNotNull(uuidEntry)
+
+        Assert.assertEquals("fdba166c-4eab-43ea-b0e8-8d7d62e1c417", uuidEntry!!.uuid.toString())
+        Assert.assertEquals("Cydhra", uuidEntry.name)
+        Assert.assertNull(uuidEntry.legacy)
+        Assert.assertNull(uuidEntry.demo)
     }
 
     @Test
