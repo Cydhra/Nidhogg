@@ -2,6 +2,7 @@
 
 package net.cydhra.nidhogg
 
+import com.google.gson.reflect.TypeToken
 import net.cydhra.nidhogg.data.NameEntry
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.data.UUIDEntry
@@ -57,11 +58,11 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      *
      * @return an array of [NameEntries][NameEntry]
      */
-    fun getNameHistoryByUUID(uuid: UUID): Array<NameEntry> {
+    fun getNameHistoryByUUID(uuid: UUID): List<NameEntry> {
         val endpoint = NAME_HISTORY_BY_UUID_ENDPOINT.format(uuid.toString().replace("-", ""))
         val response = getRequest(HOST_API_URL, endpoint)
 
-        return gson.fromJson(response.getEntity(String::class.java), Array<NameEntry>::class.java)
+        return gson.fromJson(response.getEntity(String::class.java), object : TypeToken<List<NameEntry>>() {}.type)
     }
 
     fun getUUIDsByNames(names: Array<String>) {
