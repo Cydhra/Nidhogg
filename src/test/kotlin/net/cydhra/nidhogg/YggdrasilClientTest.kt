@@ -2,6 +2,7 @@
 
 package net.cydhra.nidhogg
 
+import junit.framework.Assert.assertNotNull
 import junit.framework.Assert.assertTrue
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.Session
@@ -43,6 +44,8 @@ class YggdrasilClientTest {
     fun _1_login() {
         Assume.assumeNotNull(uri)
         session = client.login(AccountCredentials(username, password))
+        val uuid = session?.uuid
+        assertNotNull(uuid)
     }
 
     @Test
