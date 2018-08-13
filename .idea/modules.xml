@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Nidhogg.iml" filepath="$PROJECT_DIR$/Nidhogg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nidhogg.iml" filepath="$PROJECT_DIR$/.idea/modules/nidhogg.iml" />
     </modules>
   </component>
 </project>
