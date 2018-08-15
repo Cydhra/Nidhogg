@@ -90,6 +90,26 @@ abstract class NidhoggClient(private val userAgent: String) {
     }
 
     /**
+     * Execute a RESTful DELETE request at a given host and resource
+     *
+     * @param host Hostname of requested service
+     * @param endpoint resource endpoint that is requested
+     * @param header header fields to set in the request. Empty by default
+     *
+     * @return a [ClientResponse] object of Jersey Rest API
+     */
+    internal fun deleteRequest(host: String, endpoint: String, header: Map<String, String> = emptyMap()): ClientResponse {
+        assert(endpoint.startsWith("/"))
+
+        val resource = Client.create().resource(host).path(endpoint)
+        val requestBuilder = buildRequest(resource)
+        for ((key, value) in header)
+            requestBuilder.header(key, value)
+
+        return requestBuilder.delete<ClientResponse>(ClientResponse::class.java)
+    }
+
+    /**
      * Build up a request with default settings.
      * @return a builder for Jersey requests with default settings
      */
