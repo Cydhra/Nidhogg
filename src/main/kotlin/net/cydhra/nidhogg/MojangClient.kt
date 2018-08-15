@@ -175,7 +175,7 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
             val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
 
             when {
-                error.error == "Forbidden" && error.errorMessage == "Current IP is not secured" -> return false
+                error.error == "ForbiddenOperationException" && error.errorMessage == "Current IP is not secured" -> return false
 
                 error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
                 error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
