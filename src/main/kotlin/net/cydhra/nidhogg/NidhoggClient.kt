@@ -14,6 +14,7 @@ internal const val DEFAULT_CLIENT_TOKEN = "Nidhogg"
 abstract class NidhoggClient(private val userAgent: String) {
 
     protected val gson: Gson = GsonBuilder().create()
+    private val client = Client.create()
 
     /**
      * Executes a RESTful GET request at a given host and resource.
@@ -28,7 +29,7 @@ abstract class NidhoggClient(private val userAgent: String) {
             queryParams: Map<String, String> = emptyMap()): ClientResponse {
         assert(endpoint.startsWith("/"))
 
-        val resource = Client.create().resource(host).path(endpoint)
+        val resource = client.resource(host).path(endpoint)
         for ((key, value) in queryParams)
             resource.queryParam(key, value)
 
@@ -54,7 +55,7 @@ abstract class NidhoggClient(private val userAgent: String) {
     internal fun postRequest(host: String, endpoint: String, body: Any,
             mediaType: MediaType = MediaType.APPLICATION_JSON_TYPE, header: Map<String, String> = emptyMap()): ClientResponse {
         assert(endpoint.startsWith("/"))
-        val resource = Client.create().resource(host).path(endpoint)
+        val resource = client.resource(host).path(endpoint)
         val requestBuilder = buildRequest(resource)
         for ((key, value) in header)
             requestBuilder.header(key, value)
@@ -79,7 +80,7 @@ abstract class NidhoggClient(private val userAgent: String) {
             header: Map<String, String> = emptyMap()): ClientResponse {
         assert(endpoint.startsWith("/"))
 
-        val resource = Client.create().resource(host).path(endpoint)
+        val resource = client.resource(host).path(endpoint)
         val requestBuilder = buildRequest(resource)
         for ((key, value) in header)
             requestBuilder.header(key, value)
@@ -101,7 +102,7 @@ abstract class NidhoggClient(private val userAgent: String) {
     internal fun deleteRequest(host: String, endpoint: String, header: Map<String, String> = emptyMap()): ClientResponse {
         assert(endpoint.startsWith("/"))
 
-        val resource = Client.create().resource(host).path(endpoint)
+        val resource = client.resource(host).path(endpoint)
         val requestBuilder = buildRequest(resource)
         for ((key, value) in header)
             requestBuilder.header(key, value)
