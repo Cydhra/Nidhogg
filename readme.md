@@ -4,8 +4,8 @@ A Mojang [Yggdrasil](http://wiki.vg/Authentication) Java/Kotlin client for Minec
 ![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)
 
 
-## Compiling (to be updated)
-The library JAR can be build using ``mvn package``. Javadoc can be generated using ``mvn javadoc:javadoc`` or ``mvn javadoc:jar`` if you want the documentation in a JAR file.
+## Compiling
+The library JAR can be build using ``gradle jar``.
 
 ## Usage
 The Yggdrasil API is wrapped in ``YggdrasilClient``. It can be optionally instantiated with a client token, that is then used for 
@@ -30,15 +30,7 @@ client.invalidate(session)
 client.signOut(AccountCredentials(username, password))
 ````
 
-The Mojang API is wrapped in ``MojangClient``. It can be instantiated the same way as the ``YggrasilClient``. It currently offers only 
-one method:
-
-````Kotlin
-// get the UUID by player name at a time. Parameter time is optional, if not given it will be defaulted to the system time.
-client.getUUIDbyUsername(name, time)
-````
-
-The other methods of ``MojangClient`` are not implemented, yet. 
+The Mojang API is wrapped in ``MojangClient``. It can be instantiated the same way as the ``YggrasilClient``.
 
 ## Dependency Management
 This project is currently not in any Maven repository, but you can use [Jitpack](https://jitpack.io/) instead:
@@ -57,7 +49,7 @@ This project is currently not in any Maven repository, but you can use [Jitpack]
 <dependency>
     <groupId>com.github.Cydhra</groupId>
     <artifactId>Nidhogg</artifactId>
-    <version>1.2</version>
+    <version>1.3</version>
 </dependency>
 ````
 
@@ -70,12 +62,9 @@ repositories {
 ````
 ````
 dependencies {
-    compile group: 'com.github.Cydhra', name: 'Nidhogg', version: '1.2'
+    compile group: 'com.github.Cydhra', name: 'Nidhogg', version: '1.3'
 }
 ````
-
-The version should be replaced with the latest release. Jitpack will automatically fetch the requested release by its tag (provided as
-version) and provide it in its own maven repository.
 
 ## License
 This project is subject to the [Creative Commons 4.0](https://creativecommons.org/licenses/by/4.0/) license.
