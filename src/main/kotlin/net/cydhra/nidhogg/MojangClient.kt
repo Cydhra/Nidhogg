@@ -339,7 +339,33 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         }
     }
 
-    fun resetSkin(session: Session, uuid: UUID) {
-        throw UnsupportedOperationException()
+    /**
+     * Delete a skin of an account. This request is only valid, if a valid session is supplied and the IP of the requesting
+     * client is secured.
+     *
+     * @param session the session of the account whose skin shall be deleted
+     *
+     * @throws UnauthorizedOperationException if the session is invalid or the IP is not secure
+     *
+     * @see [isIpSecure]
+     * @see [submitSecurityChallengeAnswers]
+     */
+    fun resetSkin(session: Session) {
+        val response = deleteRequest(MOJANG_API_URL, SKIN_ENDPOINT.format(session.id), header = mapOf(
+                "Authorization" to "Bearer ${session.accessToken}"
+        )
+        )
+
+        if (response.status == 204) {
+            return
+        } else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
+        }
     }
 }
