@@ -12,6 +12,7 @@ import net.cydhra.nidhogg.exception.TooManyRequestsException
 import net.cydhra.nidhogg.exception.UnauthorizedOperationException
 import net.cydhra.nidhogg.requests.ErrorResponse
 import java.io.File
+import java.io.FileNotFoundException
 import java.net.URL
 import java.time.Instant
 import java.util.*
@@ -301,11 +302,16 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      * @param slim true, if the slim model shall be uploaded. False by default.
      *
      * @throws UnauthorizedOperationException if the session is invalid or the IP is not secure
+     * @throws IllegalArgumentException if the file is not a valid image
+     * @throws FileNotFoundException if [file] does not exist
      *
      * @see [isIpSecure]
      * @see [submitSecurityChallengeAnswers]
      */
     fun uploadSkin(session: Session, file: File, slim: Boolean = false) {
+        if (!file.exists())
+            throw FileNotFoundException("A valid skin image must be uploaded to change the skin")
+
         val response = putRequest(MOJANG_API_URL, SKIN_ENDPOINT.format(session.id),
                 mediaType = MediaType.MULTIPART_FORM_DATA_TYPE,
                 header = mapOf(
@@ -327,6 +333,7 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
             when {
                 error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
                 error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                error.error == "IllegalArgumentException" -> throw IllegalArgumentException(error.errorMessage)
                 else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
             }
         }
