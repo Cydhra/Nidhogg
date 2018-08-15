@@ -4,10 +4,7 @@ package net.cydhra.nidhogg
 
 import com.google.gson.reflect.TypeToken
 import com.sun.jersey.core.util.MultivaluedMapImpl
-import net.cydhra.nidhogg.data.NameEntry
-import net.cydhra.nidhogg.data.Profile
-import net.cydhra.nidhogg.data.Session
-import net.cydhra.nidhogg.data.UUIDEntry
+import net.cydhra.nidhogg.data.*
 import net.cydhra.nidhogg.exception.TooManyRequestsException
 import net.cydhra.nidhogg.exception.UnauthorizedOperationException
 import net.cydhra.nidhogg.requests.ErrorResponse
@@ -28,6 +25,7 @@ private const val UUIDS_BY_NAMES_ENDPOINT = "/profiles/minecraft"
 private const val PROFILE_BY_UUID_ENDPOINT = "/session/minecraft/profile/%s"
 private const val SKIN_ENDPOINT = "/user/profile/%s/skin"
 private const val LOCATION_ENDPOINT = "/user/security/location"
+private const val CHALLENGES_ENDPOINT = "/user/security/challenges"
 
 /**
  * A client for the Mojang API. It wraps the endpoints of the service in functions and respective data classes.
@@ -177,6 +175,35 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
             when {
                 error.error == "ForbiddenOperationException" && error.errorMessage == "Current IP is not secured" -> return false
 
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
+        }
+    }
+
+    /**
+     * Get an array of the three security questions forming the security challenge. Solving the security challenge is required to secure an
+     * IP address to perform critical account actions, such as changing the skin.
+     *
+     * @param session a valid session of the account, whose challenges are requested
+     *
+     * @return an array of three [SecurityChallenges][SecurityChallenge]
+     *
+     * @throws UnauthorizedOperationException if the session is invalid
+     */
+    fun getAccountChallenges(session: Session): Array<SecurityChallenge> {
+        val response = getRequest(MOJANG_API_URL, CHALLENGES_ENDPOINT, header = mapOf(
+                "Authorization" to "Bearer ${session.accessToken}"
+        )
+        )
+
+        if (response.status == 200) {
+            return gson.fromJson(response.getEntity(String::class.java), Array<SecurityChallenge>::class.java)
+        } else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            when {
                 error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
                 error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
                 else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
