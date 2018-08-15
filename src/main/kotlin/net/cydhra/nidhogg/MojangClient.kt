@@ -186,13 +186,13 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      * Get an array of the three security questions forming the security challenge. Solving the security challenge is required to secure an
      * IP address to perform critical account actions, such as changing the skin.
      *
-     * @param session a valid session of the account, whose challenges are requested
+     * @param session a valid session of the account whose challenges are requested
      *
      * @return an array of three [SecurityChallenges][SecurityChallenge]
      *
      * @throws UnauthorizedOperationException if the session is invalid
      */
-    fun getAccountChallenges(session: Session): Array<SecurityChallenge> {
+    fun getSecurityChallenges(session: Session): Array<SecurityChallenge> {
         val response = getRequest(MOJANG_API_URL, CHALLENGES_ENDPOINT, header = mapOf(
                 "Authorization" to "Bearer ${session.accessToken}"
         )
@@ -206,6 +206,43 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
             when {
                 error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
                 error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
+        }
+    }
+
+    /**
+     * Submit answers to the three security questions of Mojang to verify the validity of later API calls to secured endpoints. If all
+     * answers were correct, the method returns normally. If one or more answers were incorrect, an [IllegalArgumentException] is thrown.
+     *
+     * @param session a valid session for the account whose challenges shall be solved
+     * @param answers an array of exactly three [SecurityChallengeSolves][SecurityChallengeSolve] to the questions
+     *
+     * @throws UnauthorizedOperationException if the session is invalid
+     * @throws IllegalArgumentException if [answers] does not contain exactly three answers or if one or more answers where incorrect
+     *
+     * @see [isIpSecure]
+     */
+    fun submitSecurityChallengeAnswers(session: Session, answers: Array<SecurityChallengeSolve>) {
+        if (answers.size != 3)
+            throw IllegalArgumentException("The answers array must contain exactly three answers to the security challenges")
+
+        val response = postRequest(MOJANG_API_URL, LOCATION_ENDPOINT,
+                header = mapOf(
+                        "Authorization" to "Bearer ${session.accessToken}"
+                ),
+                body = gson.toJson(answers)
+        )
+
+        if (response.status == 204) {
+            return
+        } else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                error.error == "ForbiddenOperationException" -> throw IllegalArgumentException(error.errorMessage)
                 else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
             }
         }
