@@ -224,6 +224,7 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      * @throws UnauthorizedOperationException if the session is invalid
      * @throws IllegalArgumentException if [answers] does not contain exactly three answers or if one or more answers where incorrect
      *
+     * @see [getSecurityChallenges]
      * @see [isIpSecure]
      */
     fun submitSecurityChallengeAnswers(session: Session, answers: Array<SecurityChallengeSolve>) {
@@ -260,6 +261,9 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
      * @param slimModel true, if the skin is the slim model
      *
      * @throws UnauthorizedOperationException if the IP is not secured or the session is invalid
+     *
+     * @see [isIpSecure]
+     * @see [submitSecurityChallengeAnswers]
      */
     fun changeSkin(session: Session, source: URL, slimModel: Boolean = false) {
         val header = mapOf(
@@ -288,6 +292,19 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         }
     }
 
+    /**
+     * Upload a new skin for an account. This request is only valid, if a valid session is supplied and the IP of the requesting
+     * client is secured.
+     *
+     * @param session a valid session for the account
+     * @param file a PNG file with the new skin data
+     * @param slim true, if the slim model shall be uploaded. False by default.
+     *
+     * @throws UnauthorizedOperationException if the session is invalid or the IP is not secure
+     *
+     * @see [isIpSecure]
+     * @see [submitSecurityChallengeAnswers]
+     */
     fun uploadSkin(session: Session, file: File, slim: Boolean = false) {
         val response = putRequest(MOJANG_API_URL, SKIN_ENDPOINT.format(session.id),
                 mediaType = MediaType.MULTIPART_FORM_DATA_TYPE,
@@ -309,7 +326,6 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
 
             when {
                 error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
-                error.error == "ForbiddenOperationException" -> throw IllegalArgumentException("${error.error}: ${error.errorMessage}")
                 error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
                 else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
             }
