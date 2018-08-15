@@ -2,15 +2,10 @@
 
 package net.cydhra.nidhogg
 
-import junit.framework.Assert.assertNotNull
-import junit.framework.Assert.assertTrue
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.exception.InvalidSessionException
-import org.junit.Assume
-import org.junit.BeforeClass
-import org.junit.FixMethodOrder
-import org.junit.Test
+import org.junit.*
 import org.junit.runners.MethodSorters
 import java.io.File
 import java.net.URI
@@ -45,14 +40,14 @@ class YggdrasilClientTest {
         Assume.assumeNotNull(uri)
         session = client.login(AccountCredentials(username, password))
         val uuid = session?.uuid
-        assertNotNull(uuid)
+        Assert.assertNotNull(uuid)
     }
 
     @Test
     fun _2_validate() {
         Assume.assumeNotNull(uri)
         Assume.assumeNotNull(session)
-        assertTrue(client.validate(session!!))
+        Assert.assertTrue(client.validate(session!!))
     }
 
     @Test
