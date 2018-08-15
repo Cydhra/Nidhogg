@@ -22,7 +22,8 @@ repositories {
 
 dependencies {
     compile group: 'com.google.code.gson', name: 'gson', version:'2.7'
-    compile group: 'com.sun.jersey', name: 'jersey-client', version:'1.19.3'
+    compile group: 'com.sun.jersey', name: 'jersey-client', version:'1.19.4'
+    compile group: 'com.sun.jersey.contribs', name: 'jersey-multipart', version: '1.19.4'
     compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlinVersion
 
     testCompile group: 'junit', name: 'junit', version:'4.12'
