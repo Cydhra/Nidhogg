@@ -4,11 +4,14 @@ package net.cydhra.nidhogg
 
 import com.google.gson.reflect.TypeToken
 import com.sun.jersey.core.util.MultivaluedMapImpl
+import com.sun.jersey.multipart.FormDataBodyPart
+import com.sun.jersey.multipart.FormDataMultiPart
+import com.sun.jersey.multipart.file.FileDataBodyPart
 import net.cydhra.nidhogg.data.*
 import net.cydhra.nidhogg.exception.TooManyRequestsException
 import net.cydhra.nidhogg.exception.UnauthorizedOperationException
 import net.cydhra.nidhogg.requests.ErrorResponse
-import java.awt.image.BufferedImage
+import java.io.File
 import java.net.URL
 import java.time.Instant
 import java.util.*
@@ -285,8 +288,32 @@ class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN
         }
     }
 
-    fun uploadSkin(session: Session, uuid: UUID, skin: BufferedImage) {
-        throw UnsupportedOperationException()
+    fun uploadSkin(session: Session, file: File, slim: Boolean = false) {
+        val response = putRequest(MOJANG_API_URL, SKIN_ENDPOINT.format(session.id),
+                mediaType = MediaType.MULTIPART_FORM_DATA_TYPE,
+                header = mapOf(
+                        "Authorization" to "Bearer ${session.accessToken}"
+                ),
+                body = with(FormDataMultiPart()) {
+                    this.bodyPart(FormDataBodyPart().also {
+                        it.name = "model"
+                        it.value = if (slim) "slim" else ""
+                    })
+                    this.bodyPart(FileDataBodyPart("file", file))
+                })
+
+        if (response.status == 204) {
+            return
+        } else {
+            val error = gson.fromJson(response.getEntity(String::class.java), ErrorResponse::class.java)
+
+            when {
+                error.error == "TooManyRequestsException" -> throw TooManyRequestsException(error.errorMessage)
+                error.error == "ForbiddenOperationException" -> throw IllegalArgumentException("${error.error}: ${error.errorMessage}")
+                error.error == "Unauthorized" -> throw UnauthorizedOperationException("${error.error}: ${error.errorMessage}")
+                else -> throw IllegalStateException("Unexpected exception: ${error.error}: ${error.errorMessage}")
+            }
+        }
     }
 
     fun resetSkin(session: Session, uuid: UUID) {
