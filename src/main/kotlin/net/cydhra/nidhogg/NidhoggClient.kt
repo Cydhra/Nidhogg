@@ -42,6 +42,7 @@ abstract class NidhoggClient(private val userAgent: String) {
 
     /**
      * Execute a RESTful POST request at a given host and resource providing a given body.
+     *
      * @param host Hostname of requested service
      * @param endpoint resource endpoint that is requested
      * @param body request body entity
@@ -61,6 +62,31 @@ abstract class NidhoggClient(private val userAgent: String) {
         return requestBuilder
                 .type(mediaType)
                 .post<ClientResponse>(ClientResponse::class.java, body)
+    }
+
+    /**
+     * Execute a RESTful PUT request at a given host and resource providing a given body
+     *
+     * @param host Hostname of requested service
+     * @param endpoint resource endpoint that is requested
+     * @param body request body entity
+     * @param mediaType the media type of the post request. Defaults to [MediaType.APPLICATION_JSON_TYPE]
+     * @param header header fields to set in the request. Empty by default
+     *
+     * @return a [ClientResponse] object of Jersey Rest API
+     */
+    internal fun putRequest(host: String, endpoint: String, body: Any, mediaType: MediaType = MediaType.APPLICATION_JSON_TYPE,
+            header: Map<String, String> = emptyMap()): ClientResponse {
+        assert(endpoint.startsWith("/"))
+
+        val resource = Client.create().resource(host).path(endpoint)
+        val requestBuilder = buildRequest(resource)
+        for ((key, value) in header)
+            requestBuilder.header(key, value)
+
+        return requestBuilder
+                .type(mediaType)
+                .put<ClientResponse>(ClientResponse::class.java, body)
     }
 
     /**
