@@ -1,5 +1,3 @@
-# Created by .ignore support plugin (hsz.mobi)
-### AdvanceWithEclipseAndNB template
 ### NetBeans template
 nbproject/private/
 build/
@@ -8,8 +6,8 @@ dist/
 nbdist/
 nbactions.xml
 .nb-gradle/
-### Eclipse template
 
+### Eclipse template
 .metadata
 bin/
 tmp/
@@ -61,17 +59,6 @@ local.properties
 # Code Recommenders
 .recommenders/### DefaultMavenIDEATemplate template
 
-### Maven template
-target/
-pom.xml.tag
-pom.xml.releaseBackup
-pom.xml.versionsBackup
-pom.xml.next
-release.properties
-dependency-reduced-pom.xml
-buildNumber.properties
-.mvn/timing.properties
-
 ### JetBrains template
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
@@ -90,18 +77,6 @@ buildNumber.properties
 
 # IntelliJ
 /out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
-
-# JIRA plugin
-atlassian-ide-plugin.xml
-
-# Crashlytics plugin (for Android Studio and IntelliJ)
-com_crashlytics_export_strings.xml
-crashlytics.properties
-crashlytics-build.properties
-fabric.properties
 
 # Gradle
 /build/
