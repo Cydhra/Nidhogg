@@ -1,12 +1,11 @@
 buildscript {
-    ext.kotlinVersion = '1.2.60'
+    ext.kotlin_version = '1.3.72'
 
     repositories {
-        mavenCentral()
-        maven { url "https://plugins.gradle.org/m2/" }
+        jcenter()
     }
     dependencies {
-        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlinVersion
+        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlin_version
     }
 }
 
@@ -16,14 +15,23 @@ group = 'net.cydhra'
 version = '1.4'
 
 repositories {
-     maven { url "http://repo.maven.apache.org/maven2" }
+    jcenter()
 }
 
 dependencies {
-    compile group: 'com.google.code.gson', name: 'gson', version:'2.7'
-    compile group: 'com.sun.jersey', name: 'jersey-client', version:'1.19.4'
-    compile group: 'com.sun.jersey.contribs', name: 'jersey-multipart', version: '1.19.4'
-    compile group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib', version: kotlinVersion
+    implementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-jdk8', version: kotlin_version
 
-    testCompile group: 'junit', name: 'junit', version:'4.12'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.7'
+    implementation group: 'com.sun.jersey', name: 'jersey-client', version: '1.19.4'
+    implementation group: 'com.sun.jersey.contribs', name: 'jersey-multipart', version: '1.19.4'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
 }
