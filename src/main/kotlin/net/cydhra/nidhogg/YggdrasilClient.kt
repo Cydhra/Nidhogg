@@ -6,7 +6,6 @@ import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.exception.InvalidCredentialsException
 import net.cydhra.nidhogg.exception.InvalidSessionException
 import net.cydhra.nidhogg.exception.UserMigratedException
-import net.cydhra.nidhogg.exception.YggdrasilBanException
 import net.cydhra.nidhogg.requests.*
 import java.util.regex.Pattern
 
@@ -39,7 +38,6 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
      *
      * @throws UserMigratedException       if the account credentials used the player agentName but the account is migrated
      * @throws InvalidCredentialsException if the given credentials are invalid
-     * @throws YggdrasilBanException       if the client is banned from Yggdrasil
      * @throws IllegalArgumentException    if the account credentials are partially empty
      */
     fun login(credentials: AccountCredentials, agent: YggdrasilAgent = YggdrasilAgent.MINECRAFT): Session {
@@ -176,13 +174,6 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         // on invalid credentials
         if (errorResponse.errorMessage == "Invalid credentials. Invalid username or password.") {
             throw InvalidCredentialsException("Provided account credentials where invalid.")
-        }
-
-        // on mojang authentication ban
-        if (errorResponse.errorMessage == "Invalid credentials.") {
-            throw YggdrasilBanException("The client is currently banned from Mojang authentication service " +
-                    "due to too many login attempts with invalid credentials. Last " +
-                    "credentials may be valid, though")
         }
 
         // access token invalid
