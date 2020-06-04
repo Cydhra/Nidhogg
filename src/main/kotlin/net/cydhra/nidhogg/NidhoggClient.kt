@@ -9,8 +9,6 @@ import com.sun.jersey.api.client.ClientResponse
 import com.sun.jersey.api.client.WebResource
 import javax.ws.rs.core.MediaType
 
-internal const val DEFAULT_CLIENT_TOKEN = "Nidhogg"
-
 abstract class NidhoggClient(private val userAgent: String) {
 
     protected val gson: Gson = GsonBuilder().create()
@@ -115,6 +113,6 @@ abstract class NidhoggClient(private val userAgent: String) {
      * @return a builder for Jersey requests with default settings
      */
     private fun buildRequest(resource: WebResource): WebResource.Builder =
-            resource.header("User-Agent", DEFAULT_CLIENT_TOKEN)
+            resource.header("User-Agent", this.userAgent)
                     .accept(MediaType.APPLICATION_JSON_TYPE)
 }

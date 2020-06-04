@@ -34,7 +34,7 @@ private const val CHALLENGES_ENDPOINT = "/user/security/challenges"
 /**
  * A client for the Mojang API. It wraps the endpoints of the service in functions and respective data classes.
  */
-class MojangClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN) : NidhoggClient(nidhoggClientToken) {
+class MojangClient() : NidhoggClient("Niddhog/1.4") {
 
     fun checkStatus() {
         throw UnsupportedOperationException()

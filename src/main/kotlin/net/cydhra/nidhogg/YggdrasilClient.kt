@@ -7,6 +7,7 @@ import net.cydhra.nidhogg.exception.InvalidCredentialsException
 import net.cydhra.nidhogg.exception.InvalidSessionException
 import net.cydhra.nidhogg.exception.UserMigratedException
 import net.cydhra.nidhogg.requests.*
+import java.util.*
 import java.util.regex.Pattern
 
 private const val YGGDRASIL_HOST_SERVER = "https://authserver.mojang.com"
@@ -19,13 +20,15 @@ private const val ENDPOINT_INVALIDATE = "/invalidate"
 /**
  * A client for the Yggdrasil Authentication service. It wraps all endpoints of the service in functions and respective data classes.
  *
- * @param nidhoggClientToken the token used to identify this client at the Yggdrasil server. Can be chosen freely.
+ * @param yggdrasilClientToken a secret token used by a client to refresh sessions. This token should be randomly generated and must be stored
+ * by the client to later refresh access tokens.
  */
-class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TOKEN) : NidhoggClient(nidhoggClientToken) {
+class YggdrasilClient(private val yggdrasilClientToken: String = UUID.randomUUID().toString()) : NidhoggClient("Niddhog/1.4") {
 
     companion object {
         private val errorMessageRegex = Pattern.compile(
-                "\\{\"error\":\\s*\"[a-zA-Z0-9\\s\\.\\,]*\",\\s*\"errorMessage\":\\s*\"[a-zA-Z0-9\\s\\.\\,]*\"(," + "\\s*\"cause\":\\s*\"[a-zA-Z0-9\\s]*\")*\\}")
+                "\\{\"error\":\\s*\"[a-zA-Z0-9\\s\\.\\,]*\",\\s*\"errorMessage\":\\s*\"[a-zA-Z0-9\\s\\.\\,]*\"(," + "\\s*\"cause\":\\s*\"[a-zA-Z0-9\\s]*\")*\\}"
+        )
     }
 
     /**
@@ -49,15 +52,19 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
                 Agent(agent.agentName, 1),
                 credentials.username,
                 credentials.password,
-                this.nidhoggClientToken,
-                true)
+                this.yggdrasilClientToken,
+                true
+        )
 
         val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_AUTHENTICATE, this.gson.toJson(request)).getEntity(String::class.java)
         this.throwOnError(response)
 
         val authenticateResponse = this.gson.fromJson(response, AuthenticateResponse::class.java)
-        return Session(authenticateResponse.selectedProfile!!.id, authenticateResponse.selectedProfile.name, authenticateResponse.accessToken,
-                authenticateResponse.clientToken)
+        return Session(authenticateResponse.selectedProfile!!.id,
+                authenticateResponse.selectedProfile.name,
+                authenticateResponse.accessToken,
+                authenticateResponse.clientToken
+        )
     }
 
     /**
@@ -76,7 +83,8 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         }
 
         val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_VALIDATE,
-                this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken)))
+                this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken))
+        )
 
         if (response.hasEntity() && response.status != 204 /* success, no content */) {
             this.throwOnError(response.getEntity(String::class.java))
@@ -99,7 +107,8 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         }
 
         val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_REFRESH,
-                this.gson.toJson(RefreshRequest(session.accessToken, session.clientToken, true))).getEntity(String::class.java)
+                this.gson.toJson(RefreshRequest(session.accessToken, session.clientToken, true))
+        ).getEntity(String::class.java)
 
         this.throwOnError(response)
 
@@ -128,7 +137,8 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         }
 
         val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_SIGNOUT,
-                this.gson.toJson(SignOutRequest(data.username, data.password)))
+                this.gson.toJson(SignOutRequest(data.username, data.password))
+        )
         if (response.status != 204) this.throwOnError(response.getEntity(String::class.java))
     }
 
@@ -149,7 +159,8 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
 
         // invalidation and validation requests are exactly the same
         val response = postRequest(YGGDRASIL_HOST_SERVER, ENDPOINT_INVALIDATE,
-                this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken)))
+                this.gson.toJson(ValidationRequest(session.accessToken, session.clientToken))
+        )
 
         if (response.hasEntity() && response.status != 204 /* success, no content */) {
             this.throwOnError(response.getEntity(String::class.java))
@@ -184,7 +195,8 @@ class YggdrasilClient(private val nidhoggClientToken: String = DEFAULT_CLIENT_TO
         // unknown or unexpected exception
         throw RuntimeException((errorResponse.error ?: "unknown error") + ":\n" +
                 (errorResponse.errorMessage ?: "no description") + "\nCause: " +
-                (errorResponse.cause ?: "no cause"))
+                (errorResponse.cause ?: "no cause")
+        )
     }
 }
 
