@@ -24,6 +24,8 @@ dependencies {
     commonMainImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: kotlin_version
 
     commonMainImplementation group: 'io.ktor', name: 'ktor-client-core', version: ktor_version
+    commonMainImplementation group: 'io.ktor', name: 'ktor-client-json', version: ktor_version
+    commonMainImplementation group: 'io.ktor', name: 'ktor-client-serialization', version: ktor_version
 
     commonMainImplementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime-common', version: serialization_version
 
