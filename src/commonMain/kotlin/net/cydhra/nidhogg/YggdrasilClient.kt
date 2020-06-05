@@ -6,7 +6,10 @@ import io.ktor.client.HttpClient
 import io.ktor.client.features.UserAgent
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.request.get
+import io.ktor.client.request.HttpRequestBuilder
+import io.ktor.client.request.post
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.utils.io.core.Closeable
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.AuthenticationResponse
@@ -54,7 +57,8 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
             agent: YggdrasilAgent?,
             requestProfile: Boolean
     ): AuthenticationResponse {
-        val response = client.get<AuthResponse>("$YGGDRASIL_HOST_SERVER$ENDPOINT_AUTHENTICATE") {
+        val response = client.post<AuthResponse>("$YGGDRASIL_HOST_SERVER$ENDPOINT_AUTHENTICATE") {
+            constructHeaders(this)
             body = AuthRequest(
                     agent,
                     credentials.username,
@@ -74,6 +78,15 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
 
     fun refresh() {
         TODO()
+    }
+
+    /**
+     * Set default headers and settings for any http requests performed with this client.
+     *
+     * @param builder the builder for the request to be configured
+     */
+    private fun constructHeaders(builder: HttpRequestBuilder) {
+        builder.contentType(ContentType.Application.Json)
     }
 
     override fun close() {
