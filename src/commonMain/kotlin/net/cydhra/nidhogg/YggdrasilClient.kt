@@ -138,6 +138,46 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
     }
 
     /**
+     * Sign out of any remaining sessions of an account using the account's credentials. Any session that was created
+     * for this account before the signOut, is invalidated and cannot be refreshed anymore.
+     *
+     * @param accountCredentials Mojang account credentials
+     */
+    suspend fun signOut(
+            accountCredentials: AccountCredentials
+    ) {
+        val response = client.post<HttpStatement>(YGGDRASIL_HOST_SERVER + ENDPOINT_SIGNOUT) {
+            constructHeaders(this)
+            body = SignOutRequest(
+                    username = accountCredentials.username,
+                    password = accountCredentials.password
+            )
+        }
+
+        response.execute()
+    }
+
+    /**
+     * Invalidate a session. The access token can no longer be used or refreshed. The given [Session.clientToken]
+     * must be identical to the one used to obtain the session in the first place.
+     *
+     * @param session Yggdrasil session
+     */
+    suspend fun invalidate(
+            session: Session
+    ) {
+        val response = client.post<HttpStatement>(YGGDRASIL_HOST_SERVER + ENDPOINT_INVALIDATE) {
+            constructHeaders(this)
+            body = InvalidateRequest(
+                    accessToken = session.accessToken,
+                    clientToken = session.clientToken
+            )
+        }
+
+        response.execute()
+    }
+
+    /**
      * Set default headers and settings for any http requests performed with this client.
      *
      * @param builder the builder for the request to be configured

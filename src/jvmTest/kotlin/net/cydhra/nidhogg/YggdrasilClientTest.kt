@@ -72,10 +72,23 @@ class YggdrasilClientTest {
         }
     }
 
+    @Test
     fun _4_invalidate() {
+        Assume.assumeNotNull(session)
+
+        runBlocking {
+            client.invalidate(session!!)
+            Assert.assertFalse(client.validate(session!!, true))
+        }
     }
 
     @Test
     fun _5_signOut() {
+        Assume.assumeNotNull(username)
+        Assume.assumeNotNull(password)
+
+        runBlocking {
+            client.signOut(AccountCredentials(username, password))
+        }
     }
 }
