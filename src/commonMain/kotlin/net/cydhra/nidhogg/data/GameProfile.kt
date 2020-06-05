@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 /**
  * A game profile defines data about a Mojang account regarding one specific Mojang game. Information within an
  * account may vary between profiles. [GameProfile]s are returned by the authentication if an
- * [net.cydhra.nidhogg.YggdrasilAgent] is provided.
+ * [net.cydhra.nidhogg.YggdrasilAgent] is provided. All parameters except [id] and [userAlias] are optional. Unless
+ * noted, I do not know the circumstances when those parameters are present, and when they are not.
  *
  * @param agent defines the [net.cydhra.nidhogg.YggdrasilAgent.name] that can be used to request
  * authentication for this profile. May be null, if the profile is the selected profile in an authentication response.
@@ -26,11 +27,11 @@ data class GameProfile(
         val agent: String? = null,
         val id: String,
         @SerialName("name") val userAlias: String,
-        val userId: String,
-        val createdAt: Long,
-        val legacyProfile: Boolean,
-        val suspended: Boolean,
-        val paid: Boolean,
-        val migrated: Boolean,
+        val userId: String? = null,
+        val createdAt: Long? = null,
+        val legacyProfile: Boolean? = null,
+        val suspended: Boolean? = null,
+        val paid: Boolean? = null,
+        val migrated: Boolean? = null,
         val legacy: Boolean? = null
 )
