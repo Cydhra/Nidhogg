@@ -12,7 +12,7 @@ package net.cydhra.nidhogg.data
  * authentication
  * @param userProfile the user profile data, if requested during authentication
  */
-data class AuthenticationResponse(
+data class SessionResponse(
         val session: Session,
         val availableProfiles: Array<GameProfile>?,
         val selectedProfile: GameProfile?,

@@ -12,10 +12,13 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.utils.io.core.Closeable
 import net.cydhra.nidhogg.data.AccountCredentials
-import net.cydhra.nidhogg.data.AuthenticationResponse
+import net.cydhra.nidhogg.data.GameProfile
 import net.cydhra.nidhogg.data.Session
+import net.cydhra.nidhogg.data.SessionResponse
 import net.cydhra.nidhogg.requests.AuthRequest
 import net.cydhra.nidhogg.requests.AuthResponse
+import net.cydhra.nidhogg.requests.RefreshRequest
+import net.cydhra.nidhogg.requests.RefreshResponse
 
 private const val YGGDRASIL_HOST_SERVER = "https://authserver.mojang.com"
 private const val ENDPOINT_AUTHENTICATE = "/authenticate"
@@ -44,8 +47,8 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
      * Authenticate at Yggdrasil for a given service using a pair of username and password.
      *
      * @param credentials username and password for authentication
-     * @param agent a [YggdrasilAgent] instance indicating for which service the authentication is intended.
-     * @param requestProfile if true, the Yggdrasil service will respond with the user's profile information
+     * @param agent Optional: a [YggdrasilAgent] instance indicating for which service the authentication is intended.
+     * @param requestProfile Optional: if true, the Yggdrasil service will respond with the user's profile information
      *
      * @return a session instance on success
      *
@@ -54,10 +57,10 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
      */
     suspend fun authenticate(
             credentials: AccountCredentials,
-            agent: YggdrasilAgent?,
-            requestProfile: Boolean
-    ): AuthenticationResponse {
-        val response = client.post<AuthResponse>("$YGGDRASIL_HOST_SERVER$ENDPOINT_AUTHENTICATE") {
+            agent: YggdrasilAgent? = null,
+            requestProfile: Boolean = false
+    ): SessionResponse {
+        val response = client.post<AuthResponse>(YGGDRASIL_HOST_SERVER + ENDPOINT_AUTHENTICATE) {
             constructHeaders(this)
             body = AuthRequest(
                     agent,
@@ -68,7 +71,7 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
             )
         }
 
-        return AuthenticationResponse(
+        return SessionResponse(
                 session = Session(response.accessToken, response.clientToken),
                 availableProfiles = response.availableProfiles,
                 selectedProfile = response.selectedProfile,
@@ -76,8 +79,40 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
         )
     }
 
-    fun refresh() {
-        TODO()
+    /**
+     * Refresh a session access token using the previously provided client token. This will regenerate the session
+     * without using the account credentials. If the session has been invalidated before, this won't work.
+     *
+     * @param session the Mojang session that shall be refreshed
+     * @param selectedProfile Optional: the [GameProfile] this session is intended for. However, sending it will likely
+     * result
+     * in an error, so just don't do it.
+     * @param requestProfile Optional: if true, the Yggdrasil service will respond with the user's profile information
+     *
+     * @return a [SessionResponse] with [SessionResponse.availableProfiles] set to null. Other optional parameters
+     * may or may not be set. [SessionResponse.userProfile] is only present if [requestProfile] is set to true.
+     */
+    suspend fun refresh(
+            session: Session,
+            selectedProfile: GameProfile? = null,
+            requestProfile: Boolean = false
+    ): SessionResponse {
+        val response = client.post<RefreshResponse>(YGGDRASIL_HOST_SERVER + ENDPOINT_REFRESH) {
+            constructHeaders(this)
+            body = RefreshRequest(
+                    session.accessToken,
+                    session.clientToken,
+                    null,
+                    requestProfile
+            )
+        }
+
+        return SessionResponse(
+                session = Session(response.accessToken, response.clientToken),
+                availableProfiles = null,
+                selectedProfile = response.selectedProfile,
+                userProfile = response.user
+        )
     }
 
     /**

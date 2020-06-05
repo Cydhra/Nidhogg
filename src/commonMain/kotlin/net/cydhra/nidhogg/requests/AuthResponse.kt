@@ -6,7 +6,7 @@ import net.cydhra.nidhogg.data.UserProfile
 
 /**
  * One-to-one representation of the authentication response by Yggdrasil. This is not exposed to the user, but
- * restructured into an [net.cydhra.nidhogg.data.AuthenticationResponse]
+ * restructured into an [net.cydhra.nidhogg.data.SessionResponse]
  *
  * @param accessToken secret access token. Always present on success.
  * @param clientToken client token that was initially sent to Yggdrasil. Always present on success.
