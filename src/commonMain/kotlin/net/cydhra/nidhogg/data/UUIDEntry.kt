@@ -1,6 +1,8 @@
 package net.cydhra.nidhogg.data
 
-import java.util.*
+import com.benasher44.uuid.Uuid
+import com.benasher44.uuid.uuidFrom
+import kotlinx.serialization.Serializable
 
 /**
  * A response from Mojang API about a player's UUID
@@ -12,14 +14,19 @@ import java.util.*
  *
  * see <a href="http://wiki.vg/Mojang_API#Username_-.3E_UUID_at_time">Mojang API</a>
  */
-data class UUIDEntry(val id: String, val name: String, val legacy: Boolean?, val demo: Boolean?) {
+@Serializable
+data class UUIDEntry(
+        val id: String,
+        val name: String,
+        val legacy: Boolean? = null,
+        val demo: Boolean? = null) {
 
     /**
      * Returns a UUID object containing the UUID defined by [id]. However, accessing this property two times, does not return the
      * identically equal object but two objects representing the same UUID.
      */
-    val uuid: UUID?
-        get() = UUID.fromString("${id.subSequence(0, 8)}-${id.subSequence(8, 12)}-" +
+    val uuid: Uuid?
+        get() = uuidFrom("${id.subSequence(0, 8)}-${id.subSequence(8, 12)}-" +
                 "${id.subSequence(12, 16)}-${id.subSequence(16, 20)}-${id.subSequence(20, 32)}"
         )
 }
