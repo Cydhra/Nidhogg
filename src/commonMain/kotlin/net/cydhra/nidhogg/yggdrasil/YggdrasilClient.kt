@@ -2,10 +2,6 @@ package net.cydhra.nidhogg.yggdrasil
 
 import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuid4
-import io.ktor.client.HttpClient
-import io.ktor.client.features.UserAgent
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpStatement
@@ -13,11 +9,11 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.utils.io.core.Closeable
-import net.cydhra.nidhogg.NIDHOGG_USER_AGENT
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.GameProfile
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.data.SessionResponse
+import net.cydhra.nidhogg.generateHttpClient
 import net.cydhra.nidhogg.requests.*
 
 private const val YGGDRASIL_HOST_SERVER = "https://authserver.mojang.com"
@@ -34,14 +30,7 @@ private const val ENDPOINT_INVALIDATE = "/invalidate"
  * authentication is exposed in the generated [Session] and should be stored by the client for later use.
  */
 class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Closeable {
-    private val client = HttpClient() {
-        install(JsonFeature) {
-            serializer = KotlinxSerializer()
-        }
-        install(UserAgent) {
-            agent = NIDHOGG_USER_AGENT
-        }
-    }
+    private val client = generateHttpClient()
 
     /**
      * Authenticate at Yggdrasil for a given service using a pair of username and password.
