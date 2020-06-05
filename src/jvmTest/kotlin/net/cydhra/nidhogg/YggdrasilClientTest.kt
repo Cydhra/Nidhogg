@@ -5,6 +5,8 @@ package net.cydhra.nidhogg
 import kotlinx.coroutines.runBlocking
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.Session
+import net.cydhra.nidhogg.yggdrasil.MinecraftAgent
+import net.cydhra.nidhogg.yggdrasil.YggdrasilClient
 import org.junit.*
 import org.junit.runners.MethodSorters
 import java.io.File
@@ -43,7 +45,9 @@ class YggdrasilClientTest {
         Assume.assumeNotNull(password)
 
         runBlocking {
-            val response = client.authenticate(AccountCredentials(username, password), MinecraftAgent, true)
+            val response = client.authenticate(AccountCredentials(username, password),
+                    MinecraftAgent, true
+            )
             Assert.assertEquals(CLIENT_TOKEN, response.session.clientToken)
 
             session = response.session

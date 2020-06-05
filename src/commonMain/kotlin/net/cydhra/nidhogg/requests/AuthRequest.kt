@@ -1,7 +1,7 @@
 package net.cydhra.nidhogg.requests
 
 import kotlinx.serialization.Serializable
-import net.cydhra.nidhogg.YggdrasilAgent
+import net.cydhra.nidhogg.yggdrasil.YggdrasilAgent
 
 /**
  * Body of an authentication request. This is constructed by the API and not touched by the library user.

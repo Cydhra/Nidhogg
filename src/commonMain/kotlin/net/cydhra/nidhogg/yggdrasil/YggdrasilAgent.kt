@@ -1,4 +1,4 @@
-package net.cydhra.nidhogg
+package net.cydhra.nidhogg.yggdrasil
 
 import kotlinx.serialization.Serializable
 

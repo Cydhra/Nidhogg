@@ -1,4 +1,4 @@
-package net.cydhra.nidhogg
+package net.cydhra.nidhogg.yggdrasil
 
 import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuid4
@@ -13,6 +13,7 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.utils.io.core.Closeable
+import net.cydhra.nidhogg.NIDHOGG_USER_AGENT
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.GameProfile
 import net.cydhra.nidhogg.data.Session
