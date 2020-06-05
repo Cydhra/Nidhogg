@@ -52,7 +52,12 @@ class YggdrasilClientTest {
 
     @Test
     fun _2_validate() {
+        Assume.assumeNotNull(session)
 
+        runBlocking {
+            Assert.assertTrue(client.validate(session!!, true))
+            Assert.assertFalse(client.validate(Session("invalid session", "invalid token")))
+        }
     }
 
     @Test

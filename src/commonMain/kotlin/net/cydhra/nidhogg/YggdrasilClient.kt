@@ -8,17 +8,16 @@ import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.post
+import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.utils.io.core.Closeable
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.GameProfile
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.data.SessionResponse
-import net.cydhra.nidhogg.requests.AuthRequest
-import net.cydhra.nidhogg.requests.AuthResponse
-import net.cydhra.nidhogg.requests.RefreshRequest
-import net.cydhra.nidhogg.requests.RefreshResponse
+import net.cydhra.nidhogg.requests.*
 
 private const val YGGDRASIL_HOST_SERVER = "https://authserver.mojang.com"
 private const val ENDPOINT_AUTHENTICATE = "/authenticate"
@@ -113,6 +112,29 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
                 selectedProfile = response.selectedProfile,
                 userProfile = response.user
         )
+    }
+
+    /**
+     * This method can be used to check if a session can still be used to authenticate at a game server. If this
+     * method returns false, the session might still be eligible to be [refreshed][refresh].
+     *
+     * @param session the session to be validated
+     * @param doSendClientToken if false, the [Session.clientToken] is not sent within the request. This is not
+     * default behaviour but seems to be allowed. The Minecraft launcher does send the token, however.
+     */
+    suspend fun validate(
+            session: Session,
+            doSendClientToken: Boolean = true
+    ): Boolean {
+        val response = client.post<HttpStatement>(YGGDRASIL_HOST_SERVER + ENDPOINT_VALIDATE) {
+            constructHeaders(this)
+            body = if (doSendClientToken) {
+                ValidationRequest(session.accessToken, session.clientToken)
+            } else {
+                ValidationRequest(session.accessToken, null)
+            }
+        }
+        return response.execute().status == HttpStatusCode.NoContent
     }
 
     /**
