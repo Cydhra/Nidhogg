@@ -1,17 +1,6 @@
-buildscript {
-    ext.kotlin_version = '1.3.72'
-    ext.ktor_version = '1.3.2'
-    ext.serialization_version = '0.20.0'
-
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath group: 'org.jetbrains.kotlin', name: 'kotlin-gradle-plugin', version: kotlin_version
-    }
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform' version '1.3.72'
 }
-
-apply plugin: 'kotlin-multiplatform'
 
 group = 'net.cydhra'
 version = '2.0.0'
@@ -20,15 +9,69 @@ repositories {
     jcenter()
 }
 
-dependencies {
-    commonMainImplementation group: 'org.jetbrains.kotlin', name: 'kotlin-stdlib-common', version: kotlin_version
+kotlin {
+    targets {
+        fromPreset(presets.jvm, 'jvm')
+        fromPreset(presets.js, 'js') {
+            compilations.main {
+                configure([compileKotlinJs, compileTestKotlinJs]) {
+                    kotlinOptions {
+                        languageVersion = "1.3"
+                        sourceMap = true
+                        metaInfo = true
+                        moduleKind = "umd"
+                    }
+                }
+            }
+        }
+    }
 
-    commonMainImplementation group: 'io.ktor', name: 'ktor-client-core', version: ktor_version
-    commonMainImplementation group: 'io.ktor', name: 'ktor-client-json', version: ktor_version
-    commonMainImplementation group: 'io.ktor', name: 'ktor-client-serialization', version: ktor_version
-
-    commonMainImplementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime-common', version: serialization_version
-
-    commonMainImplementation group: 'com.benasher44', name: 'uuid', version: '0.1.0'
-//    testCompile group: 'junit', name: 'junit', version: '4.12'
+    sourceSets {
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common')
+                implementation group: 'io.ktor', name: 'ktor-client-core', version: ktor_version
+                implementation group: 'io.ktor', name: 'ktor-client-json', version: ktor_version
+                implementation group: 'io.ktor', name: 'ktor-client-serialization', version: ktor_version
+                implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime-common', version: serialization_version
+                implementation group: 'com.benasher44', name: 'uuid', version: '0.1.0'
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+            }
+        }
+        jvmMain {
+            dependencies {
+                implementation kotlin('stdlib-jdk8')
+                implementation group: 'io.ktor', name: 'ktor-client-cio', version: ktor_version
+                implementation group: 'io.ktor', name: 'ktor-client-json-jvm', version: ktor_version
+                implementation group: 'io.ktor', name: 'ktor-client-serialization-jvm', version: ktor_version
+                implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime', version: serialization_version
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation kotlin('test')
+                implementation kotlin('test-junit')
+                implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime', version: serialization_version
+            }
+        }
+        jsMain {
+            dependencies {
+                implementation kotlin('stdlib-js')
+                implementation group: 'io.ktor', name: 'ktor-client-js', version: ktor_version
+                implementation group: 'io.ktor', name: 'ktor-client-json-js', version: ktor_version
+                implementation group: 'io.ktor', name: 'ktor-client-serialization-js', version: ktor_version
+                implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime-js', version: serialization_version
+            }
+        }
+        jsTest {
+            dependencies {
+                implementation kotlin('test-js')
+            }
+        }
+    }
 }
