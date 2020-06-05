@@ -2,8 +2,11 @@
 
 package net.cydhra.nidhogg.data
 
+import com.benasher44.uuid.Uuid
+import com.benasher44.uuid.uuidFrom
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 /**
  * The user profile associated to an account. It does not contain any data associated with Mojang games. See
@@ -53,7 +56,18 @@ data class UserProfile(
         val legacyUser: Boolean,
         val verifiedByParent: Boolean,
         val properties: Array<ProfileProperty>
-)
+) {
+    /**
+     * Generate an instance of [Uuid] from the player [id]. The [Uuid] instance is generated lazily and will be
+     * stored afterwards.
+     */
+    @Transient
+    val uuid: Uuid by lazy {
+        uuidFrom("${id.subSequence(0, 8)}-${id.subSequence(8, 12)}-${id.subSequence(12, 16)}" +
+                "-${id.subSequence(16, 20)}-${id.subSequence(20, 32)}"
+        )
+    }
+}
 
 /**
  * Additional properties that can be assigned to [UserProfile]s as key-value-pairs. Typical properties include
