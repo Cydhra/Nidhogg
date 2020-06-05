@@ -39,17 +39,27 @@ class YggdrasilClientTest {
 
     @Test
     fun _1_authenticate() {
-        runBlocking {
-            Assume.assumeNotNull(username)
-            Assume.assumeNotNull(password)
-            val response = client.authenticate(AccountCredentials(username, password), MinecraftAgent, true)
+        Assume.assumeNotNull(username)
+        Assume.assumeNotNull(password)
 
+        runBlocking {
+            val response = client.authenticate(AccountCredentials(username, password), MinecraftAgent, true)
             Assert.assertEquals(CLIENT_TOKEN, response.session.clientToken)
+
+            session = response.session
         }
     }
 
     @Test
     fun _2_validate() {
+        Assume.assumeNotNull(session)
+
+        runBlocking {
+            val response = client.refresh(session!!, null, false)
+
+            Assert.assertEquals(session!!.clientToken, response.session.clientToken)
+            session = response.session
+        }
     }
 
     @Test
