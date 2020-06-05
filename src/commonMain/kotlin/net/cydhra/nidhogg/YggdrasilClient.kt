@@ -16,13 +16,14 @@ class YggdrasilClient() : Closeable {
      *
      * @param credentials username and password for authentication
      * @param agent a [YggdrasilAgent] instance indicating for which service the authentication is intended.
+     * @param requestProfile if true, the Yggdrasil service will respond with the user's profile information
      *
      * @return a session instance on success
      *
      * @see [MinecraftAgent]
      * @see [ScrollsAgent]
      */
-    fun authenticate(credentials: AccountCredentials, agent: YggdrasilAgent): Session {
+    fun authenticate(credentials: AccountCredentials, agent: YggdrasilAgent, requestProfile: Boolean): Session {
         TODO()
     }
 
