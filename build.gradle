@@ -36,6 +36,7 @@ kotlin {
                 implementation group: 'io.ktor', name: 'ktor-client-serialization', version: ktor_version
                 implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime-common', version: serialization_version
                 implementation group: 'com.benasher44', name: 'uuid', version: '0.1.0'
+                implementation group: 'com.soywiz.korlibs.klock', name: 'klock', version: klock_version
             }
         }
         commonTest {
@@ -51,6 +52,7 @@ kotlin {
                 implementation group: 'io.ktor', name: 'ktor-client-json-jvm', version: ktor_version
                 implementation group: 'io.ktor', name: 'ktor-client-serialization-jvm', version: ktor_version
                 implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime', version: serialization_version
+                implementation group: 'com.soywiz.korlibs.klock', name: 'klock-jvm', version: klock_version
             }
         }
         jvmTest {
