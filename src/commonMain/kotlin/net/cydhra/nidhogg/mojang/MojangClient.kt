@@ -3,10 +3,9 @@ package net.cydhra.nidhogg.mojang
 import com.benasher44.uuid.Uuid
 import com.soywiz.klock.DateTime
 import io.ktor.client.call.receive
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
+import io.ktor.client.request.*
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -172,12 +171,50 @@ class MojangClient() : Closeable {
         return httpStatement.execute().status == HttpStatusCode.NoContent
     }
 
-    suspend fun changeSkin(session: Session, source: Url, slimModel: Boolean = false) {
-        TODO()
+    /**
+     * Change the Minecraft skin of an account. This request is only valid, if a valid session is supplied and the IP
+     * of the requesting client is secured.
+     *
+     * @param session a valid session for the account whose skin shall be changed
+     * @param playerUuid the account's [Uuid]
+     * @param source a URL to an internet address containing a valid skin image
+     * @param slimModel true, if the skin is the slim model
+     *
+     * @return true, if the skin was accepted, false if the ip was not secured
+     *
+     * @see [isIpSecure]
+     * @see [submitSecurityChallengeAnswers]
+     */
+    suspend fun changeSkin(session: Session, playerUuid: Uuid, source: Url, slimModel: Boolean = false): Boolean {
+        val endpoint = SKIN_ENDPOINT.replace("%s", playerUuid.toString().replace("-", ""))
+        val statement = client.post<HttpStatement>(MOJANG_API_URL + endpoint) {
+            header("Authorization", "Bearer ${session.accessToken}")
+            contentType(ContentType.MultiPart.FormData)
+
+            body = MultiPartFormDataContent(formData {
+                append("model", if (slimModel) "slim" else "")
+                append("url", source.toString())
+            })
+        }
+
+        return statement.execute().status == HttpStatusCode.OK
     }
 
-    suspend fun resetSkin(session: Session) {
-        TODO()
+    /**
+     * Delete a skin of an account. This request is only valid, if a valid session is supplied and the IP of the
+     * requesting client is secured.
+     *
+     * @param session the session of the account whose skin shall be deleted
+     *
+     * @see [isIpSecure]
+     * @see [submitSecurityChallengeAnswers]
+     */
+    suspend fun resetSkin(session: Session, uuid: Uuid) {
+        val endpoint = SKIN_ENDPOINT.replace("%s", uuid.toString().replace("-", ""))
+        val statement = client.delete<HttpStatement>(MOJANG_API_URL + endpoint) {
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+        statement.execute()
     }
 
     private fun constructHeaders(builder: HttpRequestBuilder) {
