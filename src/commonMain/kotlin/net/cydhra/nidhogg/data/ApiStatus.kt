@@ -20,7 +20,7 @@ enum class API(val hostname: String) {
     TEXTURES_MINECRAFT("textures.minecraft.net"),
     MOJANG("mojang.com");
 
-    fun getApiUrl() = "https://" + hostname
+    fun getApiUrl() = "https://$hostname"
 }
 
 /**
