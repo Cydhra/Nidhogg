@@ -2,9 +2,12 @@
 
 package net.cydhra.nidhogg.data
 
+import kotlinx.serialization.Serializable
+
 /**
  * The different API endpoints of the whole Mojang API
  */
+@Serializable
 enum class API(val hostname: String) {
     MINECRAFT("minecraft.net"),
     SESSION_MINECRAFT("session.minecraft.net"),
@@ -23,6 +26,7 @@ enum class API(val hostname: String) {
 /**
  * The different status codes, a Mojang API can have
  */
+@Serializable
 enum class ApiStatus {
     GREEN, YELLOW, RED
 }
