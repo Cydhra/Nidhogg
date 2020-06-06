@@ -27,8 +27,8 @@ data class TexturePropertyData(
  */
 @Serializable
 data class Textures(
-        val SKIN: Texture?,
-        val CAPE: Texture?
+        val SKIN: Texture? = null,
+        val CAPE: Texture? = null
 )
 
 /**

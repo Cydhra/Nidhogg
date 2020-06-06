@@ -102,8 +102,14 @@ class MojangClient() : Closeable {
         }
     }
 
-    suspend fun getProfileByUUID(uuid: Uuid): UserProfile {
-        TODO()
+    /**
+     * @param uuid the uuid of an account
+     *
+     * @return a [UserProfile] instance
+     */
+    suspend fun getProfileByUUID(uuid: Uuid): SkinProfile {
+        val endpoint = PROFILE_BY_UUID_ENDPOINT.replace("%s", uuid.toString().replace("-", ""))
+        return client.get(SESSION_SERVER_URL + endpoint)
     }
 
     suspend fun isIpSecure(session: Session): Boolean {

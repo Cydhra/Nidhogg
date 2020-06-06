@@ -84,6 +84,11 @@ class MojangClientTest {
 
     @Test
     fun getProfileByUUID() {
+        runBlocking {
+            val profile = client.getProfileByUUID(UUID.fromString(CYDHRA_UUID))
 
+            Assert.assertNotNull(profile)
+            Assert.assertNotNull(profile.textures)
+        }
     }
 }

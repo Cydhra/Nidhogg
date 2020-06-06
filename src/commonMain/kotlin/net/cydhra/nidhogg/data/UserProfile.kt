@@ -6,9 +6,6 @@ import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuidFrom
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import net.cydhra.nidhogg.util.decodeBase64
 
 /**
  * The user profile associated to an account. It does not contain any data associated with Mojang games. See
@@ -70,20 +67,6 @@ data class UserProfile(
                 "-${id.subSequence(16, 20)}-${id.subSequence(20, 32)}"
         )
     }
-
-    /**
-     * The encoded texture data of the user profile. This will throw an exception if no texture data are present.
-     * Usually texture data is only present, if the profile is requested through
-     * [net.cydhra.nidhogg.mojang.MojangClient.getProfileByUUID]
-     */
-    val textures: TexturePropertyData by lazy {
-        val json = Json(JsonConfiguration.Stable)
-        json.fromJson(
-                TexturePropertyData.serializer(),
-                json.parseJson(properties!!.find { it.name == "textures" }!!.value.decodeBase64())
-        )
-    }
-
 }
 
 /**
