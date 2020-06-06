@@ -5,6 +5,7 @@ import com.soywiz.klock.DateTime
 import io.ktor.client.call.receive
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
+import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
@@ -112,12 +113,34 @@ class MojangClient() : Closeable {
         return client.get(SESSION_SERVER_URL + endpoint)
     }
 
+    /**
+     * Request whether this IP address is allowed to perform secured requests. Obtain this permission by answering
+     * the security questions using [getSecurityChallenges] and [submitSecurityChallengeAnswers]
+     *
+     * @param session A valid Yggdrasil session, that has been authorized by [submitSecurityChallengeAnswers]
+     *
+     * @return true, if the IP address previously submitted the security answers
+     */
     suspend fun isIpSecure(session: Session): Boolean {
-        TODO()
+        val response = client.get<HttpStatement>(MOJANG_API_URL + LOCATION_ENDPOINT) {
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
+
+        return response.execute().status == HttpStatusCode.NoContent
     }
 
+    /**
+     * Obtain the security questions associated with the account. The challenges come with ids, that must match the
+     * ids of the answers submitted using [submitSecurityChallengeAnswers]
+     *
+     * @param session A valid Yggdrasil session of the account in question
+     *
+     * @return an array of exactly three security questions
+     */
     suspend fun getSecurityChallenges(session: Session): Array<SecurityChallenge> {
-        TODO()
+        return client.get(MOJANG_API_URL + CHALLENGES_ENDPOINT) {
+            header("Authorization", "Bearer ${session.accessToken}")
+        }
     }
 
     suspend fun submitSecurityChallengeAnswers(session: Session, answers: Array<SecurityChallengeSolve>) {
