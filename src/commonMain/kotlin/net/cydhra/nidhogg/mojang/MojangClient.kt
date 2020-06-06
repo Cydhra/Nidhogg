@@ -2,9 +2,12 @@ package net.cydhra.nidhogg.mojang
 
 import com.benasher44.uuid.Uuid
 import com.soywiz.klock.DateTime
+import io.ktor.client.call.receive
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
+import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.Url
 import io.ktor.http.contentType
 import io.ktor.utils.io.core.Closeable
@@ -17,6 +20,7 @@ private const val SESSION_SERVER_URL = "https://sessionserver.mojang.com"
 
 private const val STATUS_ENDPOINT = "/check"
 private const val USER_TO_UUID_BY_TIME_ENDPOINT = "/users/profiles/minecraft/%s"
+private const val BY_TIME_PARAMETER = "?at=%s"
 private const val NAME_HISTORY_BY_UUID_ENDPOINT = "/user/profiles/%s/names"
 private const val UUIDS_BY_NAMES_ENDPOINT = "/profiles/minecraft"
 private const val PROFILE_BY_UUID_ENDPOINT = "/session/minecraft/profile/%s"
@@ -24,7 +28,7 @@ private const val SKIN_ENDPOINT = "/user/profile/%s/skin"
 private const val LOCATION_ENDPOINT = "/user/security/location"
 private const val CHALLENGES_ENDPOINT = "/user/security/challenges"
 
-class YggdrasilClient() : Closeable {
+class MojangClient() : Closeable {
     private val client = generateHttpClient()
 
     suspend fun checkStatus() {
@@ -43,16 +47,32 @@ class YggdrasilClient() : Closeable {
      * information
      */
     suspend fun getUUIDbyUsername(name: String, time: DateTime? = null): UUIDEntry? {
-        val endpoint = USER_TO_UUID_BY_TIME_ENDPOINT.replace("%s", name)
-        client.get<UUIDEntry>(MOJANG_API_URL + endpoint) {
-
+        var endpoint = USER_TO_UUID_BY_TIME_ENDPOINT.replace("%s", name)
+        if (time == null) {
+            endpoint += BY_TIME_PARAMETER.replace("%s", "0")
+        } else {
+            endpoint += BY_TIME_PARAMETER.replace("%s", time.unixMillisLong.toString())
         }
 
-        TODO()
+        val statement = client.get<HttpStatement>(MOJANG_API_URL + endpoint)
+        val response = statement.execute()
+        return when (response.status) {
+            HttpStatusCode.NoContent -> null
+            else -> response.receive()
+        }
     }
 
+    /**
+     * Receive a list of names that were associated with the account specified by [uuid] and the time of change. The
+     * first name does not have a time of change.
+     *
+     * @param uuid the account's [Uuid]
+     *
+     * @return a list of [NameHistoryEntry]
+     */
     suspend fun getNameHistoryByUUID(uuid: Uuid): List<NameHistoryEntry> {
-        TODO()
+        val endpoint = NAME_HISTORY_BY_UUID_ENDPOINT.replace("%s", uuid.toString().replace("-", ""))
+        return client.get(MOJANG_API_URL + endpoint)
     }
 
     suspend fun getUUIDsByNames(names: List<String>): List<UUIDEntry> {
