@@ -1,4 +1,4 @@
-package net.cydhra.nidhogg.requests
+package net.cydhra.nidhogg.yggdrasil.requests
 
 import kotlinx.serialization.Serializable
 import net.cydhra.nidhogg.data.GameProfile

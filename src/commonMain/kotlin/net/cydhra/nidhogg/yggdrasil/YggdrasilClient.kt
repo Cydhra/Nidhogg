@@ -14,7 +14,7 @@ import net.cydhra.nidhogg.data.GameProfile
 import net.cydhra.nidhogg.data.Session
 import net.cydhra.nidhogg.data.SessionResponse
 import net.cydhra.nidhogg.generateHttpClient
-import net.cydhra.nidhogg.requests.*
+import net.cydhra.nidhogg.yggdrasil.requests.*
 
 private const val YGGDRASIL_HOST_SERVER = "https://authserver.mojang.com"
 private const val ENDPOINT_AUTHENTICATE = "/authenticate"
@@ -119,7 +119,9 @@ class YggdrasilClient(private val clientToken: String = uuid4().toString()) : Cl
         val response = client.post<HttpStatement>(YGGDRASIL_HOST_SERVER + ENDPOINT_VALIDATE) {
             constructHeaders(this)
             body = if (doSendClientToken) {
-                ValidationRequest(session.accessToken, session.clientToken)
+                ValidationRequest(session.accessToken,
+                        session.clientToken
+                )
             } else {
                 ValidationRequest(session.accessToken, null)
             }
