@@ -136,6 +136,9 @@ class MojangClient() : Closeable {
      * @param session A valid Yggdrasil session of the account in question
      *
      * @return an array of exactly three security questions
+     *
+     * @see [submitSecurityChallengeAnswers]
+     * @see [isIpSecure]
      */
     suspend fun getSecurityChallenges(session: Session): Array<SecurityChallenge> {
         return client.get(MOJANG_API_URL + CHALLENGES_ENDPOINT) {
@@ -143,8 +146,30 @@ class MojangClient() : Closeable {
         }
     }
 
-    suspend fun submitSecurityChallengeAnswers(session: Session, answers: Array<SecurityChallengeSolve>) {
-        TODO()
+    /**
+     * Submit answers to the three security questions of Mojang to verify the validity of later API calls to secured endpoints. If all
+     * answers were correct, the method returns normally. If one or more answers were incorrect, an [IllegalArgumentException] is thrown.
+     *
+     * @param session a valid session for the account whose challenges shall be solved
+     * @param answers an array of exactly three [SecurityChallengeSolves][SecurityChallengeSolve] to the questions
+     *
+     * @throws IllegalArgumentException if more or less than three solves are submitted
+     *
+     * @return true, if the security challenges were correctly solved
+     *
+     * @see [getSecurityChallenges]
+     * @see [isIpSecure]
+     */
+    suspend fun submitSecurityChallengeAnswers(session: Session, answers: List<SecurityChallengeSolve>): Boolean {
+        if (answers.size != 3)
+            throw IllegalArgumentException("The answers array must contain exactly three answers to the security challenges")
+
+        val httpStatement = client.post<HttpStatement>(MOJANG_API_URL + LOCATION_ENDPOINT) {
+            constructHeaders(this)
+            header("Authorization", "Bearer ${session.accessToken}")
+            body = answers
+        }
+        return httpStatement.execute().status == HttpStatusCode.NoContent
     }
 
     suspend fun changeSkin(session: Session, source: Url, slimModel: Boolean = false) {

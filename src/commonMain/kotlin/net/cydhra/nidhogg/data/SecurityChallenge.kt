@@ -9,7 +9,19 @@ import kotlinx.serialization.Serializable
  * @param question a [Question] instance for this answer-question pair
  */
 @Serializable
-data class SecurityChallenge(val answer: Answer, val question: Question)
+data class SecurityChallenge(val answer: Answer, val question: Question) {
+
+    /**
+     * Generate the answer for this particular security question
+     *
+     * @param answer text answer by end-user
+     *
+     * @return a [SecurityChallengeSolve] correctly formatted to be the answer to the question
+     */
+    fun answerQuestion(answer: String): SecurityChallengeSolve {
+        return SecurityChallengeSolve(this.answer.id, answer)
+    }
+}
 
 /**
  * A answer for a security question
