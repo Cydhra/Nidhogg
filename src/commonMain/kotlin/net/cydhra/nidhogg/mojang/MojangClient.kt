@@ -5,6 +5,7 @@ import com.soywiz.klock.DateTime
 import io.ktor.client.call.receive
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.get
+import io.ktor.client.request.post
 import io.ktor.client.statement.HttpStatement
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
@@ -75,8 +76,30 @@ class MojangClient() : Closeable {
         return client.get(MOJANG_API_URL + endpoint)
     }
 
+    /**
+     * Receive a list of [Uuid]s, one for each entry in the given list of usernames. If any name does not match an
+     * account, it will be missing in the result list. Other than that, order is preserved.
+     *
+     * @param names a list of usernames.
+     *
+     * @return a list of [UUIDEntries][UUIDEntry]
+     *
+     * @throws [IllegalArgumentException] if more than 100 names are requested at once
+     * @throws [IllegalArgumentException] if any of the usernames is an empty string
+     */
     suspend fun getUUIDsByNames(names: List<String>): List<UUIDEntry> {
-        TODO()
+        // the api also raises those errors but of course the input can already be validated here and then the
+        // response can be expected to be valid
+        if (names.size > 100)
+            throw IllegalArgumentException("You cannot request more than 100 names per request")
+
+        if (names.any { it == "" })
+            throw IllegalArgumentException("profileName can not be null or empty.")
+
+        return client.post(MOJANG_API_URL + UUIDS_BY_NAMES_ENDPOINT) {
+            constructHeaders(this)
+            body = names
+        }
     }
 
     suspend fun getProfileByUUID(uuid: Uuid): UserProfile {
