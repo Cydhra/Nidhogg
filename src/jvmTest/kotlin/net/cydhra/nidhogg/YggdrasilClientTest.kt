@@ -24,9 +24,9 @@ class YggdrasilClientTest {
         val client = YggdrasilClient(clientToken = CLIENT_TOKEN)
 
         var uri: URI? = null
-        lateinit var username: String
-        lateinit var password: String
-        lateinit var alias: String
+        var username: String? = null
+        var password: String? = null
+        var alias: String? = null
 
         var session: Session? = null
 
@@ -40,7 +40,7 @@ class YggdrasilClientTest {
             val credentials: List<String> = file.readText().split(":")
             username = credentials[0]
             password = credentials[1]
-            alias = credentials[2]
+            alias = if (credentials.size > 2) credentials[2] else null
         }
 
         @AfterClass
@@ -60,7 +60,7 @@ class YggdrasilClientTest {
         Assume.assumeNotNull(password)
 
         runBlocking {
-            val response = client.authenticate(AccountCredentials(username, password),
+            val response = client.authenticate(AccountCredentials(username!!, password!!),
                     MinecraftAgent, true
             )
             Assert.assertEquals(CLIENT_TOKEN, response.session.clientToken)
@@ -107,7 +107,7 @@ class YggdrasilClientTest {
         Assume.assumeNotNull(password)
 
         runBlocking {
-            client.signOut(AccountCredentials(username, password))
+            client.signOut(AccountCredentials(username!!, password!!))
         }
     }
 
@@ -123,7 +123,7 @@ class YggdrasilClientTest {
 
         runBlocking {
             ruleThrown.expect(UserMigratedException::class.java)
-            client.authenticate(AccountCredentials(alias, password))
+            client.authenticate(AccountCredentials(alias!!, password!!))
         }
     }
 
