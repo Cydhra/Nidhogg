@@ -5,9 +5,13 @@ package net.cydhra.nidhogg
 import kotlinx.coroutines.runBlocking
 import net.cydhra.nidhogg.data.AccountCredentials
 import net.cydhra.nidhogg.data.Session
+import net.cydhra.nidhogg.exception.InvalidAccessTokenException
+import net.cydhra.nidhogg.exception.InvalidCredentialsException
+import net.cydhra.nidhogg.exception.UserMigratedException
 import net.cydhra.nidhogg.yggdrasil.MinecraftAgent
 import net.cydhra.nidhogg.yggdrasil.YggdrasilClient
 import org.junit.*
+import org.junit.rules.ExpectedException
 import org.junit.runners.MethodSorters
 import java.io.File
 import java.net.URI
@@ -22,6 +26,7 @@ class YggdrasilClientTest {
         var uri: URI? = null
         lateinit var username: String
         lateinit var password: String
+        lateinit var alias: String
 
         var session: Session? = null
 
@@ -35,6 +40,7 @@ class YggdrasilClientTest {
             val credentials: List<String> = file.readText().split(":")
             username = credentials[0]
             password = credentials[1]
+            alias = credentials[2]
         }
 
         @AfterClass
@@ -43,6 +49,10 @@ class YggdrasilClientTest {
             client.close()
         }
     }
+
+    @Rule
+    @JvmField
+    val ruleThrown = ExpectedException.none()!!
 
     @Test
     fun _1_authenticate() {
@@ -98,6 +108,38 @@ class YggdrasilClientTest {
 
         runBlocking {
             client.signOut(AccountCredentials(username, password))
+        }
+    }
+
+    /**
+     * Test whether a [UserMigratedException] is thrown when logging into a migrated account that has been using the
+     * old authentication scheme before. Note: if the account was never migrated (but created after migration due),
+     * this test will fail.
+     */
+    @Test
+    fun _6_accountMigratedTest() {
+        Assume.assumeNotNull(alias)
+        Assume.assumeNotNull(password)
+
+        runBlocking {
+            ruleThrown.expect(UserMigratedException::class.java)
+            client.authenticate(AccountCredentials(alias, password))
+        }
+    }
+
+    @Test
+    fun _7_invalidCredentialsTest() {
+        runBlocking {
+            ruleThrown.expect(InvalidCredentialsException::class.java)
+            client.authenticate(AccountCredentials("definitely not a username", "this password is secure"))
+        }
+    }
+
+    @Test
+    fun _8_invalidAccessTokenTest() {
+        runBlocking {
+            ruleThrown.expect(InvalidAccessTokenException::class.java)
+            client.refresh(Session("definitely not a token", "Nidhogg sees you"))
         }
     }
 }
