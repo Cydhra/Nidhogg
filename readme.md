@@ -1,13 +1,11 @@
 # Nidhogg
-A Mojang [Yggdrasil](http://wiki.vg/Authentication) Java/Kotlin client for Minecraft Account authentication
-
-![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)
-
+A Mojang [Yggdrasil](http://wiki.vg/Authentication) Kotlin/Multplatform client for Minecraft account authentication
+ and communication to the Mojang APIs
 
 ## Compiling
 The library JAR can be build using ``gradle jar``.
 
-## Usage
+## Outdated: Usage
 The Yggdrasil API is wrapped in ``YggdrasilClient``. It can be optionally instantiated with a client token, that is then used for 
 identification at the Yggdrasil API. Alternatively, it uses a default token.
 
@@ -67,4 +65,8 @@ dependencies {
 ````
 
 ## License
-This project is subject to the [Creative Commons 4.0](https://creativecommons.org/licenses/by/4.0/) license.
+This project is subject to the [MIT License](https://en.wikipedia.org/wiki/MIT_License) license.
+Earlier versions of this library were distributed under Creative Commons.
+If you still use those old versions, the license agreement is unchanged.
+The new license should not make a notable difference to you, Creative Commons is just unsuited for code, so any new
+ code added to the library will be distributed under the terms of MIT license.
