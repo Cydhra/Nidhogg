@@ -91,4 +91,11 @@ class MojangClientTest {
             Assert.assertNotNull(profile.textures)
         }
     }
+
+    @Test
+    fun getBlockedServers() {
+        runBlocking {
+            Assert.assertTrue(client.getBlockedServers().isNotEmpty())
+        }
+    }
 }

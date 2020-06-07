@@ -28,6 +28,7 @@ private const val PROFILE_BY_UUID_ENDPOINT = "/session/minecraft/profile/%s"
 private const val SKIN_ENDPOINT = "/user/profile/%s/skin"
 private const val LOCATION_ENDPOINT = "/user/security/location"
 private const val CHALLENGES_ENDPOINT = "/user/security/challenges"
+private const val BLOCKED_SERVERS_ENDPOINT = "/blockedservers"
 
 class MojangClient() : Closeable {
     private val client = generateHttpClient()
@@ -215,6 +216,17 @@ class MojangClient() : Closeable {
             header("Authorization", "Bearer ${session.accessToken}")
         }
         statement.execute()
+    }
+
+    /**
+     * Get a list of SHA1 hashes of server addresses blocked by the vanilla client. If the vanilla client tries to
+     * connect to a server address, the address and each of its subdomains is hashed and matched against this list.
+     * For example, if the client would try to connect to `ac.cydhra.net`, it would match against the hashes of
+     * `ac.cydhra.net`, `*.cydhra.net` and `*.net`. If the hash is present in the list, the client will refuse
+     * connection. This way Mojang enforces the EULA.
+     */
+    suspend fun getBlockedServers(): List<String> {
+        return client.get<String>(SESSION_SERVER_URL + BLOCKED_SERVERS_ENDPOINT).split("\n").toList()
     }
 
     private fun constructHeaders(builder: HttpRequestBuilder) {
