@@ -14,6 +14,7 @@ import io.ktor.http.contentType
 import io.ktor.utils.io.core.Closeable
 import net.cydhra.nidhogg.data.*
 import net.cydhra.nidhogg.generateHttpClient
+import net.cydhra.nidhogg.mojang.requests.StatisticsRequest
 
 private const val STATUS_API_URL = "https://status.mojang.com"
 private const val MOJANG_API_URL = "https://api.mojang.com"
@@ -29,6 +30,7 @@ private const val SKIN_ENDPOINT = "/user/profile/%s/skin"
 private const val LOCATION_ENDPOINT = "/user/security/location"
 private const val CHALLENGES_ENDPOINT = "/user/security/challenges"
 private const val BLOCKED_SERVERS_ENDPOINT = "/blockedservers"
+private const val STATISTICS_ENDPOINT = "/orders/statistics"
 
 class MojangClient() : Closeable {
     private val client = generateHttpClient()
@@ -227,6 +229,23 @@ class MojangClient() : Closeable {
      */
     suspend fun getBlockedServers(): List<String> {
         return client.get<String>(SESSION_SERVER_URL + BLOCKED_SERVERS_ENDPOINT).split("\n").toList()
+    }
+
+    /**
+     * Get sale metrics for a list of metric keys. The metrics are all summed up and returned as a [SaleMetrics]
+     * instance.
+     *
+     * @param metrics a list of metric keys
+     *
+     * @return a sum of all sales of the given metrics
+     *
+     * @see MetricKeys
+     */
+    suspend fun getSaleStatistics(metrics: List<MetricKey>): SaleMetrics {
+        return client.post(MOJANG_API_URL + STATISTICS_ENDPOINT) {
+            constructHeaders(this)
+            body = StatisticsRequest(metrics)
+        }
     }
 
     private fun constructHeaders(builder: HttpRequestBuilder) {

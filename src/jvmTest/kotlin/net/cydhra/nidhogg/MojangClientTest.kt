@@ -2,6 +2,7 @@ package net.cydhra.nidhogg
 
 import com.soywiz.klock.DateTime
 import kotlinx.coroutines.runBlocking
+import net.cydhra.nidhogg.data.MetricKeys
 import net.cydhra.nidhogg.data.NameHistoryEntry
 import net.cydhra.nidhogg.mojang.MojangClient
 import org.junit.Assert
@@ -96,6 +97,16 @@ class MojangClientTest {
     fun getBlockedServers() {
         runBlocking {
             Assert.assertTrue(client.getBlockedServers().isNotEmpty())
+        }
+    }
+
+    @Test
+    fun saleMetrics() {
+        runBlocking {
+            Assert.assertTrue(
+                    client.getSaleStatistics(MetricKeys.all()).total
+                            > client.getSaleStatistics(MetricKeys.minecraft()).total
+            )
         }
     }
 }
