@@ -48,7 +48,6 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation kotlin('stdlib-jdk8')
-                implementation group: 'io.ktor', name: 'ktor-client-cio', version: ktor_version
                 implementation group: 'io.ktor', name: 'ktor-client-json-jvm', version: ktor_version
                 implementation group: 'io.ktor', name: 'ktor-client-serialization-jvm', version: ktor_version
                 implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime', version: serialization_version
@@ -60,6 +59,7 @@ kotlin {
                 implementation kotlin('test')
                 implementation kotlin('test-junit')
                 implementation group: 'org.jetbrains.kotlinx', name: 'kotlinx-serialization-runtime', version: serialization_version
+                implementation group: 'io.ktor', name: 'ktor-client-cio', version: ktor_version
             }
         }
         jsMain {
