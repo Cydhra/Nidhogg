@@ -5,10 +5,7 @@ import kotlinx.coroutines.runBlocking
 import net.cydhra.nidhogg.data.MetricKeys
 import net.cydhra.nidhogg.data.NameHistoryEntry
 import net.cydhra.nidhogg.mojang.MojangClient
-import org.junit.Assert
-import org.junit.BeforeClass
-import org.junit.Rule
-import org.junit.Test
+import org.junit.*
 import org.junit.rules.ExpectedException
 import java.util.*
 
@@ -25,6 +22,12 @@ class MojangClientTest {
         @BeforeClass
         fun setup() {
             client = MojangClient()
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun tearDown() {
+            client.close()
         }
     }
 

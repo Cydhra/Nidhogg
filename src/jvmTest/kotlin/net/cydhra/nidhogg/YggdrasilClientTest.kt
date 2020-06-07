@@ -37,6 +37,11 @@ class YggdrasilClientTest {
             password = credentials[1]
         }
 
+        @AfterClass
+        @JvmStatic
+        fun tearDown() {
+            client.close()
+        }
     }
 
     @Test
