@@ -35,8 +35,16 @@ private const val STATISTICS_ENDPOINT = "/orders/statistics"
 class MojangClient() : Closeable {
     private val client = generateHttpClient()
 
-    suspend fun checkStatus() {
-        throw UnsupportedOperationException()
+    /**
+     * Get the status of all Mojang APIs. Status is generally indicated by one [ApiStatus].
+     *
+     * @return a map of all Mojang API endpoints and their respective status
+     */
+    suspend fun checkStatus(): Map<String, ApiStatus> {
+        return mapOf(*client.get<List<Map<String, ApiStatus>>>(STATUS_API_URL + STATUS_ENDPOINT)
+                .flatMap { map -> map.entries.asIterable() }
+                .map { entry -> entry.key to entry.value }
+                .toTypedArray())
     }
 
     /**

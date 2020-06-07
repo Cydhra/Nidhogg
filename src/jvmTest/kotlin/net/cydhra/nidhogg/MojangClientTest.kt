@@ -34,6 +34,9 @@ class MojangClientTest {
 
     @Test
     fun checkStatus() {
+        runBlocking {
+            Assert.assertTrue(client.checkStatus().isNotEmpty())
+        }
     }
 
     @Test
