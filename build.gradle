@@ -79,11 +79,3 @@ kotlin {
         }
     }
 }
-
-/**
- * Define an install task to support the outdated publishing mechanism of jitpack. It basically just calls the
- * publish task.
- */
-task install {
-    dependsOn 'publish'
-}
