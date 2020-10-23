@@ -3,7 +3,8 @@ A Mojang [Yggdrasil](http://wiki.vg/Authentication) Kotlin/Multplatform client f
  and communication to the Mojang APIs
 
 ## Compiling
-The library JAR can be build using ``gradle jar``.
+The library JAR can be build using ``gradle jvmJar`` or ``gradle jsJar`` respectively. Please note, that the JS
+ version may depend on the same code base, so it should work, but I never actually tested it.
 
 ## Usage
 The Yggdrasil API is wrapped in ``YggdrasilClient``. When creating the client, a secret token can be given as
