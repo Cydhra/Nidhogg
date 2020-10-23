@@ -95,14 +95,14 @@ class MojangClient() : Closeable {
      *
      * @return a list of [UUIDEntries][UUIDEntry]
      *
-     * @throws [IllegalArgumentException] if more than 100 names are requested at once
+     * @throws [IllegalArgumentException] if more than 10 names are requested at once
      * @throws [IllegalArgumentException] if any of the usernames is an empty string
      */
     suspend fun getUUIDsByNames(names: List<String>): List<UUIDEntry> {
         // the api also raises those errors but of course the input can already be validated here and then the
         // response can be expected to be valid
-        if (names.size > 100)
-            throw IllegalArgumentException("You cannot request more than 100 names per request")
+        if (names.size > 10)
+            throw IllegalArgumentException("You cannot request more than 10 names per request")
 
         if (names.any { it == "" })
             throw IllegalArgumentException("profileName can not be null or empty.")
