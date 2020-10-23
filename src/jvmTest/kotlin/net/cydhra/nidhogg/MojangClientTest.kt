@@ -4,6 +4,7 @@ import com.soywiz.klock.DateTime
 import kotlinx.coroutines.runBlocking
 import net.cydhra.nidhogg.data.MetricKeys
 import net.cydhra.nidhogg.data.NameHistoryEntry
+import net.cydhra.nidhogg.exception.BadRequestException
 import net.cydhra.nidhogg.mojang.MojangClient
 import org.junit.*
 import org.junit.rules.ExpectedException
@@ -70,6 +71,14 @@ class MojangClientTest {
         runBlocking {
             val uuidEntries = client.getUUIDsByNames(listOf("Cydhra", "@invalid_username@"))
             Assert.assertEquals(1, uuidEntries.size)
+        }
+    }
+
+    @Test
+    fun getUUIDsByNamesInvalid() {
+        runBlocking {
+            ruleThrown.expect(BadRequestException::class.java)
+            client.getUUIDsByNames(listOf("very_long_username_that_is_disallowed_by_mojang"))
         }
     }
 
