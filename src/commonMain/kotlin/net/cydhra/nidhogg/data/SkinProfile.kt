@@ -4,7 +4,6 @@ package net.cydhra.nidhogg.data
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import net.cydhra.nidhogg.util.decodeBase64
 
 /**
@@ -24,10 +23,10 @@ data class SkinProfile(
      * [net.cydhra.nidhogg.mojang.MojangClient.getProfileByUUID]
      */
     val textures: TexturePropertyData by lazy {
-        val json = Json(JsonConfiguration.Stable)
-        json.fromJson(
+        val json = Json { }
+        json.decodeFromJsonElement(
                 TexturePropertyData.serializer(),
-                json.parseJson(properties!!.find { it.name == "textures" }!!.value.decodeBase64())
+                json.parseToJsonElement(properties.find { it.name == "textures" }!!.value.decodeBase64())
         )
     }
 }

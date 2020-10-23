@@ -31,7 +31,9 @@ internal fun generateHttpClient(): HttpClient = HttpClient {
             when (response.status) {
                 HttpStatusCode.Forbidden -> {
                     val error =
-                            Json.parse(ServerErrorResponse.serializer(), response.content.readRemaining().readText())
+                            Json.decodeFromString(ServerErrorResponse.serializer(),
+                                    response.content.readRemaining().readText()
+                            )
                     if (error.error == "ForbiddenOperationException") {
                         when {
                             error.cause == "UserMigratedException" -> {
