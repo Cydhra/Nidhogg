@@ -68,7 +68,7 @@ class MojangClientTest {
     @Test
     fun getUUIDsByNames() {
         runBlocking {
-            val uuidEntries = client.getUUIDsByNames(listOf("Cydhra", "ThisPlayerDoesNotExistBecause@"))
+            val uuidEntries = client.getUUIDsByNames(listOf("Cydhra", "@invalid_username@"))
             Assert.assertEquals(1, uuidEntries.size)
         }
     }
