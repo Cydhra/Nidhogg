@@ -97,6 +97,8 @@ class MojangClient() : Closeable {
      *
      * @throws [IllegalArgumentException] if more than 10 names are requested at once
      * @throws [IllegalArgumentException] if any of the usernames is an empty string
+     * @throws [net.cydhra.nidhogg.exception.BadRequestException] if a username does not hold against the
+     * requirements of Mojang. This cannot be checked by the client, so it is raised server-side
      */
     suspend fun getUUIDsByNames(names: List<String>): List<UUIDEntry> {
         // the api also raises those errors but of course the input can already be validated here and then the
