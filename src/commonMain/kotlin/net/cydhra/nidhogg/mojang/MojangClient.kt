@@ -158,7 +158,7 @@ class MojangClient() : Closeable {
 
     /**
      * Submit answers to the three security questions of Mojang to verify the validity of later API calls to secured endpoints. If all
-     * answers were correct, the method returns normally. If one or more answers were incorrect, an [IllegalArgumentException] is thrown.
+     * answers were correct, the method returns normally.
      *
      * @param session a valid session for the account whose challenges shall be solved
      * @param answers an array of exactly three [SecurityChallengeSolves][SecurityChallengeSolve] to the questions
