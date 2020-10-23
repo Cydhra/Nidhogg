@@ -53,6 +53,13 @@ internal fun generateHttpClient(): HttpClient = HttpClient {
                         throw RuntimeException("unexpected error from server: \"${error}\"")
                     }
                 }
+                HttpStatusCode.BadRequest -> {
+                    val error =
+                            Json.decodeFromString(ServerErrorResponse.serializer(),
+                                    response.content.readRemaining().readText()
+                            )
+                    throw BadRequestException(error.description)
+                }
             }
         }
     }
