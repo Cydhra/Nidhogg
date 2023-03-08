@@ -1,6 +1,8 @@
 # Nidhogg
 A Mojang [Yggdrasil](http://wiki.vg/Authentication) Kotlin/Multplatform client for Minecraft account authentication
  and communication to the Mojang APIs
+ 
+ Since Mojang has updated the authentication scheme to Microsoft OAuth, this library has been archived!
 
 ## Compiling
 The library JAR can be build using ``gradle jvmJar`` or ``gradle jsJar`` respectively. Please note, that the JS
